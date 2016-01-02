@@ -1,4 +1,4 @@
-# logcatf
+# Logcatf
 A command to format Android Logcat.
 
 ## Usage
@@ -7,16 +7,21 @@ A command to format Android Logcat.
 $ adb logcat | logcatf "%Time, %Message"
 ```
 
-Available keyword:
+Available Keyword:
 
     %Time, %Tag, %Priority, %Pid, %Tid, %Message
 
 Example:
 
-    "%Time %Message"
-    "%Time, %Tag, %Priority, %Pid, %Tid, %Message"
+```bash
+# show only time and message.
+$ adb logcat | logcatf "%Time %Message"
 
-Default:
+# output to csv format.
+$ adb logcat | logcatf "%Time, %Tag, %Priority, %Pid, %Tid, %Message" > logcat.csv
+```
+
+Default Format:
 
     "%Time %Tag %Priority %Message"
 
