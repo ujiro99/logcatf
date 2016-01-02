@@ -4,33 +4,33 @@ A command to format Android Logcat.
 ## Usage
 
 ```bash
-$ adb logcat | logcatf "%Time, %Message"
+$ adb logcat -v time | logcatf "%time, %message"
 ```
 
 Available Keyword:
 
-    %Time, %Tag, %Priority, %Pid, %Tid, %Message
+    %time, %tag, %priority, %pid, %tid, %message
 
 Example:
 
 ```bash
 # show only time and message.
-$ adb logcat | logcatf "%Time %Message"
+$ adb logcat -v time | logcatf "%time %message"
 
 # output to csv format.
-$ adb logcat | logcatf "%Time, %Tag, %Priority, %Pid, %Tid, %Message" > logcat.csv
+$ adb logcat -v threadtime | logcatf "%time, %tag, %priority, %pid, %tid, %message" > logcat.csv
 ```
 
 Default Format:
 
-    "%Time %Tag %Priority %Message"
+    "%time %tag %priority %message"
 
 ## Install
 
 To install, use `go get`:
 
 ```bash
-$ go get -d github.com/Ujiro99/logcatf
+$ go get github.com/Ujiro99/logcatf
 ```
 
 ## Contribution
