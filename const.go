@@ -6,19 +6,19 @@ const (
 	// Version of this command.
 	Version string = "0.1.0"
 	// DefaultFormat will be used if format wasn't specified.
-	DefaultFormat string = "%Time %Tag %Priority %Message"
+	DefaultFormat string = "%time %tag %priority %message"
 )
 
 // Message has message strings.
 var Message = map[string]string{
 	"helpFormat": `Format of output
 	- Available keyword:
-	  %Time, %Tag, %Priority, %Pid, %Tid, %Message
+	  %time, %tag, %priority, %pid, %tid, %message
 
 	- Example:
-	  "%Time %Message"
-	  "%Time, %Tag, %Priority, %Pid, %Tid, %Message"
+	  "%time %message"
+	  "%time, %tag, %priority, %pid, %tid, %message"
 
 	- Default:
-	  "%Time %Tag %Priority %Message"`,
+	  "%time %tag %priority %message"`,
 }

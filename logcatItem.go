@@ -8,17 +8,17 @@ import (
 
 var (
 	keys = []string{
-		"Time", "Pid", "Tid", "Priority", "Tag", "Message",
+		"time", "pid", "tid", "priority", "tag", "message",
 	}
-	formatRegexps = regexp.MustCompile(`%(Time)|%(Pid)|%(Tid)|%(Priority)|%(Tag)|%(Message)`)
+	formatRegexps = regexp.MustCompile(`%(time)|%(pid)|%(tid)|%(priority)|%(tag)|%(message)`)
 )
 
 // LogcatItem represents a line of logcat log.
 type LogcatItem map[string]string
 
-// Time return parsed time.
-func (item *LogcatItem) Time() time.Time {
-	t, _ := time.Parse("12-28 18:54:08.043", (*item)["Time"])
+// time return parsed time.
+func (item *LogcatItem) time() time.Time {
+	t, _ := time.Parse("12-28 18:54:08.043", (*item)["time"])
 	return t
 }
 

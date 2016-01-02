@@ -32,13 +32,13 @@ var (
 
 	// regex pattrens for analyze logcat.
 	patterns = map[string]*regexp.Regexp{
-		"brief":      regexp.MustCompile(`^(?P<Priority>[VDIWEAF])\/(?P<Tag>.*?)\s*\(\s*(?P<Pid>\d+)\):\s(?P<Message>.*?)\s*$`),
-		"process":    regexp.MustCompile(`^(?P<Priority>[VDIWEAF])\(\s*(?P<Pid>\d+)\)\s(?P<Message>.*?)\s*\((?P<Tag>.*)\)$`),
-		"tag":        regexp.MustCompile(`^(?P<Priority>[VDIWEAF])\/(?P<Tag>.*?)\s*:\s(?P<Message>.*?)\s*$`),
-		"time":       regexp.MustCompile(`^(?P<Time>\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+):*\s(?P<Priority>[VDIWEAF])\/(?P<Tag>.*?)\s*\(\s*(?P<Pid>\d+)\):\s(?P<Message>.*?)\s*$`),
-		"threadtime": regexp.MustCompile(`^(?P<Time>\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+)\s*(?P<Pid>\d+)\s*(?P<Tid>\d+)\s(?P<Priority>[VDIWEAF])\s(?P<Tag>.*?)\s*:\s(?P<Message>.*?)\s*$`),
-		"ddms_save":  regexp.MustCompile(`^(?P<Time>\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+):*\s(?P<Priority>VERBOSE|DEBUG|ERROR|WARN|INFO|ASSERT)\/(?P<Tag>.*?)\((?P<Pid>\s*\d+)\):\s(?P<Message>.*?)\s*$`),
-		"raw":        regexp.MustCompile(`^(?P<Message>.*?)\s*$`),
+		"brief":      regexp.MustCompile(`^(?P<priority>[VDIWEAF])\/(?P<tag>.*?)\s*\(\s*(?P<pid>\d+)\):\s(?P<message>.*?)\s*$`),
+		"process":    regexp.MustCompile(`^(?P<priority>[VDIWEAF])\(\s*(?P<pid>\d+)\)\s(?P<message>.*?)\s*\((?P<tag>.*)\)$`),
+		"tag":        regexp.MustCompile(`^(?P<priority>[VDIWEAF])\/(?P<tag>.*?)\s*:\s(?P<message>.*?)\s*$`),
+		"time":       regexp.MustCompile(`^(?P<time>\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+):*\s(?P<priority>[VDIWEAF])\/(?P<tag>.*?)\s*\(\s*(?P<pid>\d+)\):\s(?P<message>.*?)\s*$`),
+		"threadtime": regexp.MustCompile(`^(?P<time>\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+)\s*(?P<pid>\d+)\s*(?P<tid>\d+)\s(?P<priority>[VDIWEAF])\s(?P<tag>.*?)\s*:\s(?P<message>.*?)\s*$`),
+		"ddms_save":  regexp.MustCompile(`^(?P<time>\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+):*\s(?P<priority>VERBOSE|DEBUG|ERROR|WARN|INFO|ASSERT)\/(?P<tag>.*?)\((?P<pid>\s*\d+)\):\s(?P<message>.*?)\s*$`),
+		"raw":        regexp.MustCompile(`^(?P<message>.*?)\s*$`),
 	}
 
 	// cache of parser.

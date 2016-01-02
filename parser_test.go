@@ -9,12 +9,12 @@ import (
 
 var (
 	parsedHas = map[string]map[string]bool{
-		"brief":      map[string]bool{"Time": false, "Pid": true, "Tid": false, "Priority": true, "Tag": true, "Message": true},
-		"process":    map[string]bool{"Time": false, "Pid": true, "Tid": false, "Priority": true, "Tag": true, "Message": true},
-		"tag":        map[string]bool{"Time": false, "Pid": false, "Tid": false, "Priority": true, "Tag": true, "Message": true},
-		"time":       map[string]bool{"Time": true, "Pid": true, "Tid": false, "Priority": true, "Tag": true, "Message": true},
-		"threadtime": map[string]bool{"Time": true, "Pid": true, "Tid": true, "Priority": true, "Tag": true, "Message": true},
-		"raw":        map[string]bool{"Time": false, "Pid": false, "Tid": false, "Priority": false, "Tag": false, "Message": true},
+		"brief":      map[string]bool{"time": false, "pid": true, "tid": false, "priority": true, "tag": true, "message": true},
+		"process":    map[string]bool{"time": false, "pid": true, "tid": false, "priority": true, "tag": true, "message": true},
+		"tag":        map[string]bool{"time": false, "pid": false, "tid": false, "priority": true, "tag": true, "message": true},
+		"time":       map[string]bool{"time": true, "pid": true, "tid": false, "priority": true, "tag": true, "message": true},
+		"threadtime": map[string]bool{"time": true, "pid": true, "tid": true, "priority": true, "tag": true, "message": true},
+		"raw":        map[string]bool{"time": false, "pid": false, "tid": false, "priority": false, "tag": false, "message": true},
 	}
 
 	// TODO not supported yet.
@@ -96,12 +96,12 @@ func TestParse_allFormat(t *testing.T) {
 
 func TestParse_removeTailSpace(t *testing.T) {
 	expects := map[string]string{
-		"Time":     "12-28 18:54:07.180",
-		"Pid":      "930",
-		"Tid":      "931",
-		"Priority": "I",
-		"Tag":      "auditd",
-		"Message":  "  test Message",
+		"time":     "12-28 18:54:07.180",
+		"pid":      "930",
+		"tid":      "931",
+		"priority": "I",
+		"tag":      "auditd",
+		"message":  "  test Message",
 	}
 
 	for format, log := range logPatternsHasSpace {
@@ -117,7 +117,7 @@ func TestParse_removeTailSpace(t *testing.T) {
 
 func TestParse_hasTabInMessage(t *testing.T) {
 	expects := map[string]string{
-		"Message": "	test Message",
+		"message": "	test Message",
 	}
 
 	for format, log := range logPatternsHasTab {
