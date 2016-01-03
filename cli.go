@@ -28,8 +28,8 @@ func (cli *CLI) Run(args []string) int {
 		parser  Parser
 		app     = kingpin.New(Name, Message["commandDescription"])
 		format  = app.Arg("format", Message["helpFormat"]).Default(DefaultFormat).String()
-		trigger = app.Flag("trigger", "Regexp for triggering a command.").Short('t').String()
-		command = app.Flag("command", "command.").Short('c').String()
+		trigger = app.Flag("trigger", Message["helpTrigger"]).Short('t').String()
+		command = app.Flag("command", Message["helpCommand"]).Short('c').String()
 	)
 
 	app.HelpFlag.Short('h')
