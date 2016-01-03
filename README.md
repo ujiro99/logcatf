@@ -1,6 +1,8 @@
 # Logcatf
 A command to format Android Logcat.
 
+[![Coverage Status](https://coveralls.io/repos/ujiro99/logcatf/badge.svg?branch=master&service=github)](https://coveralls.io/github/ujiro99/logcatf?branch=master)
+
 ## Usage
 
 ```bash
