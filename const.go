@@ -20,6 +20,7 @@ var Message = map[string]string{
    adb logcat -v threadtime | "%time, %tag, %message" > logcat.csv
  - Default Format:
    "%time %tag %priority %message"`,
-	"helpTrigger": "Regex for triggering a command.",
-	"helpCommand": "Command to be executed.",
+	"helpTrigger":           "Regex for triggering a command.",
+	"helpCommand":           "Command to be executed.",
+	"msgUnavailableKeyword": "error: %s is not available. Please check `Availavle Keyword:` on help.",
 }
