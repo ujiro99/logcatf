@@ -38,25 +38,20 @@ func Parse(line string) LogcatItem {
 		log.Warnf("Parse failed: %s", line)
 		return nil
 	}
-	match := search(line, patterns[logFormat])
-	item := LogcatItem{}
-	for key, value := range match {
-		item[key] = value
-	}
-
+	item := search(line, patterns[logFormat])
 	return item
 }
 
 // search keyword using regex pattern.
-func search(line string, pattern *regexp.Regexp) map[string]string {
+func search(line string, pattern *regexp.Regexp) LogcatItem {
 	match := pattern.FindStringSubmatch(line)
-	result := make(map[string]string, len(keys))
-	for i, name := range pattern.SubexpNames() {
+	item := LogcatItem{}
+	for i, key := range pattern.SubexpNames() {
 		if i != 0 {
-			result[name] = match[i]
+			item[key] = match[i]
 		}
 	}
-	return result
+	return item
 }
 
 // findFormat analyze a line and find out logcat format.

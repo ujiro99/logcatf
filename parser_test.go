@@ -117,3 +117,24 @@ func TestParse_hasTabInMessage(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkParse(b *testing.B) {
+	// threadtime format
+	for i := 0; i < b.N; i++ {
+		Parse(logPatterns["threadtime"])
+	}
+}
+
+func BenchmarkFindFormat(b *testing.B) {
+	// threadtime format
+	for i := 0; i < b.N; i++ {
+		findFormat(logPatterns["threadtime"])
+	}
+}
+
+func BenchmarkSearch(b *testing.B) {
+	// threadtime format
+	for i := 0; i < b.N; i++ {
+		search(logPatterns["threadtime"], patterns["threadtime"])
+	}
+}
