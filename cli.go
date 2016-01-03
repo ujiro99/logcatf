@@ -28,6 +28,12 @@ type CLIParameter struct {
 	command *string
 }
 
+var formatter Formatter
+
+func init() {
+	formatter = &logcatFormatter{}
+}
+
 // Run invokes the CLI with the given arguments.
 func (cli *CLI) Run(args []string) int {
 
@@ -35,11 +41,12 @@ func (cli *CLI) Run(args []string) int {
 	err := verifyParameter(cliParam)
 	if err != nil {
 		fmt.Fprintln(cli.errStream, err.Error())
+		log.Debug(err.Error())
 		return ExitCodeError
 	}
 
 	// convert format (long => short)
-	normalized := normalizeFormat(*cliParam.format)
+	normalized := formatter.Normarize(*cliParam.format)
 	cliParam.format = &normalized
 
 	// exec parse and format
@@ -48,7 +55,7 @@ func (cli *CLI) Run(args []string) int {
 		if item == nil {
 			continue
 		}
-		output := item.Format(*cliParam.format)
+		output := formatter.Format(*cliParam.format, &item)
 		fmt.Fprintln(cli.outStream, output)
 	}
 
@@ -77,5 +84,5 @@ func initParameter(args []string) *CLIParameter {
 }
 
 func verifyParameter(param *CLIParameter) error {
-	return verifyFormat(*param.format)
+	return formatter.Verify(*param.format)
 }
