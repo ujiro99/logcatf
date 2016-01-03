@@ -68,7 +68,7 @@ func initParameter(args []string) *CLIParameter {
 	var (
 		app     = kingpin.New(Name, Message["commandDescription"])
 		format  = app.Arg("format", Message["helpFormat"]).Default(DefaultFormat).String()
-		trigger = app.Flag("trigger", Message["helpTrigger"]).Short('t').String()
+		trigger = app.Flag("on", Message["helpTrigger"]).Short('o').String()
 		command = app.Flag("command", Message["helpCommand"]).Short('c').String()
 	)
 	app.HelpFlag.Short('h')
