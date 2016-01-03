@@ -49,18 +49,9 @@ var (
 
 func TestFindFormat(t *testing.T) {
 	for expect, log := range logPatterns {
-		finded := FindFormat(log)
+		finded := findFormat(log)
 		if expect != finded {
 			t.Errorf("expected %s to eq %s", expect, finded)
-		}
-	}
-}
-
-func TestGetParser(t *testing.T) {
-	for format := range logPatterns {
-		parser := GetParser(format)
-		if parser == nil {
-			t.Errorf("Parser did not created on %s.", format)
 		}
 	}
 }
@@ -78,10 +69,8 @@ func TestParse_allFormat(t *testing.T) {
 		for line := range lines.Lines(bufio.NewReader(fp)) {
 			// logfile has 2 formats, raw and some else.
 			// "--------- beginning of *" must be used raw format.
-			logFormat := FindFormat(line)
-			parser := GetParser(logFormat)
-			item := parser.Parse(line)
-			expect := parsedHas[logFormat]
+			item := Parse(line)
+			expect := parsedHas[findFormat(line)]
 			for key, hasValue := range expect {
 				if hasValue {
 					_, ok := item[key]
@@ -105,8 +94,7 @@ func TestParse_removeTailSpace(t *testing.T) {
 	}
 
 	for format, log := range logPatternsHasSpace {
-		parser := GetParser(format)
-		item := parser.Parse(log)
+		item := Parse(log)
 		for key, expect := range expects {
 			if parsedHas[format][key] && expect != item[key] {
 				t.Errorf("on %s, \"%s\" must eq \"%s\"", format, item[key], expect)
@@ -121,8 +109,7 @@ func TestParse_hasTabInMessage(t *testing.T) {
 	}
 
 	for format, log := range logPatternsHasTab {
-		parser := GetParser(format)
-		item := parser.Parse(log)
+		item := Parse(log)
 		for key, expect := range expects {
 			if parsedHas[format][key] && expect != item[key] {
 				t.Errorf("on %s, \"%s\" must eq \"%s\"", format, item[key], expect)
