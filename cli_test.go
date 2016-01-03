@@ -59,7 +59,7 @@ func TestRun_formatEscapedCharactor(t *testing.T) {
 	}
 }
 
-func TestRun_formatUnavailableKeyword(t *testing.T) {
+func TestRun_formatError_UnavailableKeyword(t *testing.T) {
 	err := new(bytes.Buffer)
 	cli := newCli()
 	cli.errStream = err
@@ -73,6 +73,26 @@ func TestRun_formatUnavailableKeyword(t *testing.T) {
 
 	expect := fmt.Sprintf(Message["msgUnavailableKeyword"], "%level") + "\n"
 	str := err.String()
+	if str != expect {
+		t.Errorf("expected \"%s\" to eq \"%s\"", str, expect)
+	}
+}
+
+func TestRun_formatShort(t *testing.T) {
+	cli := newCli()
+	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I auditd  : type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295")
+	out := new(bytes.Buffer)
+	cli.outStream = out
+
+	args := []string{"./logcatf", "%t %i %I %p %a: %m"}
+	status := cli.Run(args)
+
+	if status != ExitCodeOK {
+		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
+	}
+
+	expect := "12-28 18:54:07.180 930 931 I auditd: type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295\n"
+	str := out.String()
 	if str != expect {
 		t.Errorf("expected \"%s\" to eq \"%s\"", str, expect)
 	}

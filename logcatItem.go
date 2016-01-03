@@ -3,14 +3,21 @@ package main
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 )
 
 var (
-	keys = []string{
-		"time", "pid", "tid", "priority", "tag", "message",
+	formatRegex  = regexp.MustCompile(`%(time)|%(pid)|%(tid)|%(priority)|%(tag)|%(message)`)
+	sformatRegex = regexp.MustCompile(`%(t)|%(i)|%(I)|%(p)|%(a)|%(m)`)
+	formatMap    = map[string]string{
+		"time":     "t",
+		"pid":      "i",
+		"tid":      "I",
+		"priority": "p",
+		"tag":      "a",
+		"message":  "m",
 	}
-	formatRegexps  = regexp.MustCompile(`%(time)|%(pid)|%(tid)|%(priority)|%(tag)|%(message)`)
 	tabRegexps     = regexp.MustCompile(`\\t`)
 	newLineRegexps = regexp.MustCompile(`\\n`)
 )
@@ -32,18 +39,22 @@ func (item *LogcatItem) Format(format string) string {
 	return result
 }
 
+// replace keyword to real value. use short format.
+// ex) "%t %p" => "12-28 19:01:14.073 GLSUser"
 func (item *LogcatItem) replaceKeyword(format string) string {
-	matches := formatRegexps.FindAllStringSubmatch(format, len(keys))
+	matches := sformatRegex.FindAllStringSubmatch(format, len(formatMap))
 	formatArgs := make([]interface{}, 0, len(matches))
-	// find matched keyword
+	// find matched keyword and store value on item
 	for _, match := range matches {
-		key := ""
-		for j := 1; key == ""; j++ {
-			key = match[j]
+		for _, m := range match {
+			key, ok := findKey(formatMap, m)
+			if ok {
+				formatArgs = append(formatArgs, (*item)[key])
+				break
+			}
 		}
-		formatArgs = append(formatArgs, (*item)[key])
 	}
-	format = formatRegexps.ReplaceAllString(format, "%s")
+	format = sformatRegex.ReplaceAllString(format, "%s")
 	return fmt.Sprintf(format, formatArgs...)
 }
 
@@ -52,4 +63,57 @@ func (item *LogcatItem) replaceEscape(format string) string {
 	result = tabRegexps.ReplaceAllString(result, "\t")
 	result = newLineRegexps.ReplaceAllString(result, "\n")
 	return result
+}
+
+func verifyFormat(format string) error {
+	// find unavailable keyword.
+	const all = -1
+	removed := formatRegex.ReplaceAllString(format, "")
+	removed = sformatRegex.ReplaceAllString(removed, "")
+	keyRegexp := regexp.MustCompile(`%\w+`)
+	matches := keyRegexp.FindAllString(removed, all)
+
+	if len(matches) == 0 {
+		return nil // no probrem!
+	}
+
+	// return error message.
+	err := ParameterError{}
+	for _, match := range matches {
+		errMsg := fmt.Sprintf(Message["msgUnavailableKeyword"], match)
+		err.errors = append(err.errors, errMsg)
+	}
+	return &err
+}
+
+// ParameterError has error message of parameter.
+type ParameterError struct {
+	errors []string
+}
+
+// Error returns all error message.
+func (e *ParameterError) Error() string {
+	if e.errors != nil {
+		return strings.Join(e.errors, "\n")
+	}
+	return ""
+}
+
+// convert long keys in format to short keys.
+func normalizeFormat(format string) string {
+	const all = -1
+	for long, short := range formatMap {
+		tmp := strings.Replace(format, long, short, all)
+		format = tmp
+	}
+	return format
+}
+
+func findKey(m map[string]string, value string) (string, bool) {
+	for k, v := range m {
+		if v == value {
+			return k, true
+		}
+	}
+	return "", false
 }

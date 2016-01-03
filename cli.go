@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"regexp"
-	"strings"
 
 	"github.com/Maki-Daisuke/go-lines"
 	log "github.com/Sirupsen/logrus"
@@ -39,6 +37,10 @@ func (cli *CLI) Run(args []string) int {
 		fmt.Fprintln(cli.errStream, err.Error())
 		return ExitCodeError
 	}
+
+	// convert format (long => short)
+	normalized := normalizeFormat(*cliParam.format)
+	cliParam.format = &normalized
 
 	// exec parse and format
 	for line := range lines.Lines(cli.inStream) {
@@ -75,34 +77,5 @@ func initParameter(args []string) *CLIParameter {
 }
 
 func verifyParameter(param *CLIParameter) error {
-	// find unavailable keyword.
-	noLimit := -1
-	removed := formatRegexps.ReplaceAllString(*param.format, "")
-	keyRegexp := regexp.MustCompile(`%\w+`)
-	matches := keyRegexp.FindAllString(removed, noLimit)
-
-	if len(matches) == 0 {
-		return nil // no probrem!
-	}
-
-	// return error message.
-	err := ParameterError{}
-	for _, match := range matches {
-		errMsg := fmt.Sprintf(Message["msgUnavailableKeyword"], match)
-		err.errors = append(err.errors, errMsg)
-	}
-	return &err
-}
-
-// ParameterError has error message of parameter.
-type ParameterError struct {
-	errors []string
-}
-
-// Error returns all error message.
-func (e *ParameterError) Error() string {
-	if e.errors != nil {
-		return strings.Join(e.errors, "\n")
-	}
-	return ""
+	return verifyFormat(*param.format)
 }
