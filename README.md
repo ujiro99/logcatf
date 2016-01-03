@@ -6,12 +6,20 @@ A Command line tool to format Android Logcat.
 ## Usage
 
 ```bash
-$ adb logcat -v time | logcatf "%time, %message"
+$ adb logcat -v time | logcatf "%t, %m"
 ```
 
 Available Keyword:
 
-    %time, %tag, %priority, %pid, %tid, %message
+| format | long ver. |
+|:------:|:---------:|
+|   %t   | %time     |
+|   %a   | %tag      |
+|   %p   | %priority |
+|   %i   | %pid      |
+|   %I   | %tid      |
+|   %m   | %message  |
+
 
 Example:
 
@@ -20,7 +28,7 @@ Example:
 $ adb logcat -v time | logcatf "%time %message"
 
 # output to csv format.
-$ adb logcat -v threadtime | logcatf "%time, %tag, %priority, %pid, %tid, %message" > logcat.csv
+$ adb logcat -v threadtime | logcatf "%t, %a, %p, %i, %I, %m" > logcat.csv
 ```
 
 Default Format:
