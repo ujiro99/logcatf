@@ -1,7 +1,7 @@
-# Logcatf
-A command to format Android Logcat.
+# Logcatf  [![Build Status](https://travis-ci.org/ujiro99/logcatf.svg?branch=master)](https://travis-ci.org/ujiro99/logcatf)  [![Coverage Status](https://coveralls.io/repos/ujiro99/logcatf/badge.svg?branch=master&service=github)](https://coveralls.io/github/ujiro99/logcatf?branch=master)
 
-[![Coverage Status](https://coveralls.io/repos/ujiro99/logcatf/badge.svg?branch=master&service=github)](https://coveralls.io/github/ujiro99/logcatf?branch=master)
+A Command line tool to format Android Logcat.
+
 
 ## Usage
 
