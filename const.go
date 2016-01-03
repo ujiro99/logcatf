@@ -23,4 +23,5 @@ var Message = map[string]string{
 	"helpTrigger":           "Regex for triggering a command.",
 	"helpCommand":           "Command to be executed.",
 	"msgUnavailableKeyword": "error: %s is not available. Please check `Availavle Keyword:` on help.",
+	"msgDuplicatedKeyword":  "error: %s or %s is duplicated.",
 }

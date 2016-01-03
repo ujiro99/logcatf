@@ -71,10 +71,33 @@ func TestRun_formatError_UnavailableKeyword(t *testing.T) {
 		t.Errorf("expected %d to eq %d", status, ExitCodeError)
 	}
 
-	expect := fmt.Sprintf(Message["msgUnavailableKeyword"], "%level") + "\n"
+	expect := fmt.Sprintf(Message["msgUnavailableKeyword"], "%level")
 	str := err.String()
-	if str != expect {
+	if !strings.Contains(str, expect) {
 		t.Errorf("expected \"%s\" to eq \"%s\"", str, expect)
+	}
+}
+
+func TestRun_formatError_DuplicatedKeyword(t *testing.T) {
+	err := new(bytes.Buffer)
+	cli := newCli()
+	cli.errStream = err
+
+	args := strings.Split(`./logcatf "%t\t%p\t%t\t%priority"`, " ")
+	status := cli.Run(args)
+
+	if status != ExitCodeError {
+		t.Errorf("expected %d to eq %d", status, ExitCodeError)
+	}
+
+	expect1 := fmt.Sprintf(Message["msgDuplicatedKeyword"], "%time", "%t")
+	expect2 := fmt.Sprintf(Message["msgDuplicatedKeyword"], "%priority", "%p")
+	str := err.String()
+	if !strings.Contains(str, expect1) {
+		t.Errorf("expected \"%s\" contains \"%s\"", str, expect1)
+	}
+	if !strings.Contains(str, expect2) {
+		t.Errorf("expected \"%s\" contains \"%s\"", str, expect2)
 	}
 }
 

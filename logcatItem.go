@@ -66,6 +66,23 @@ func (item *LogcatItem) replaceEscape(format string) string {
 }
 
 func verifyFormat(format string) error {
+	err := ParameterError{}
+	var msg []string
+	msg = verifyUnabailavleKeyword(format)
+	if msg != nil {
+		err.errors = append(err.errors, msg...)
+	}
+	msg = verifyDuplicatedKeyword(format)
+	if msg != nil {
+		err.errors = append(err.errors, msg...)
+	}
+	if len(err.errors) == 0 {
+		return nil
+	}
+	return &err
+}
+
+func verifyUnabailavleKeyword(format string) []string {
 	// find unavailable keyword.
 	removed := formatRegex.ReplaceAllString(format, "")
 	removed = sformatRegex.ReplaceAllString(removed, "")
@@ -77,12 +94,37 @@ func verifyFormat(format string) error {
 	}
 
 	// return error message.
-	err := ParameterError{}
+	msgs := make([]string, len(matches))
 	for _, match := range matches {
 		errMsg := fmt.Sprintf(Message["msgUnavailableKeyword"], match)
-		err.errors = append(err.errors, errMsg)
+		msgs = append(msgs, errMsg)
 	}
-	return &err
+	return msgs
+}
+
+func verifyDuplicatedKeyword(format string) []string {
+	// find unavailable keyword.
+	format = normalizeFormat(format)
+	duplicated := [][]string{}
+	for k, v := range formatMap {
+		count := strings.Count(format, "%"+v)
+		if count > 1 {
+			duplicated = append(duplicated, []string{k, v})
+		}
+	}
+
+	// is duplicated... ?
+	if len(duplicated) == 0 {
+		return nil // no probrem!
+	}
+
+	// return error message.
+	msgs := make([]string, len(duplicated))
+	for _, d := range duplicated {
+		errMsg := fmt.Sprintf(Message["msgDuplicatedKeyword"], "%"+d[0], "%"+d[1])
+		msgs = append(msgs, errMsg)
+	}
+	return msgs
 }
 
 // ParameterError has error message of parameter.
@@ -107,6 +149,7 @@ func normalizeFormat(format string) string {
 	return format
 }
 
+// TODO find out generic api for find key.
 func findKey(m map[string]string, value string) (string, bool) {
 	for k, v := range m {
 		if v == value {
