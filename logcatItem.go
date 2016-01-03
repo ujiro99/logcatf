@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const flagAll = -1
+
 var (
 	formatRegex  = regexp.MustCompile(`%(time)|%(pid)|%(tid)|%(priority)|%(tag)|%(message)`)
 	sformatRegex = regexp.MustCompile(`%(t)|%(i)|%(I)|%(p)|%(a)|%(m)`)
@@ -18,8 +20,6 @@ var (
 		"tag":      "a",
 		"message":  "m",
 	}
-	tabRegexps     = regexp.MustCompile(`\\t`)
-	newLineRegexps = regexp.MustCompile(`\\n`)
 )
 
 // LogcatItem represents a line of logcat log.
@@ -60,18 +60,17 @@ func (item *LogcatItem) replaceKeyword(format string) string {
 
 func (item *LogcatItem) replaceEscape(format string) string {
 	result := format
-	result = tabRegexps.ReplaceAllString(result, "\t")
-	result = newLineRegexps.ReplaceAllString(result, "\n")
+	result = strings.Replace(result, "\\t", "\t", flagAll)
+	result = strings.Replace(result, "\\n", "\n", flagAll)
 	return result
 }
 
 func verifyFormat(format string) error {
 	// find unavailable keyword.
-	const all = -1
 	removed := formatRegex.ReplaceAllString(format, "")
 	removed = sformatRegex.ReplaceAllString(removed, "")
 	keyRegexp := regexp.MustCompile(`%\w+`)
-	matches := keyRegexp.FindAllString(removed, all)
+	matches := keyRegexp.FindAllString(removed, flagAll)
 
 	if len(matches) == 0 {
 		return nil // no probrem!
@@ -101,9 +100,8 @@ func (e *ParameterError) Error() string {
 
 // convert long keys in format to short keys.
 func normalizeFormat(format string) string {
-	const all = -1
 	for long, short := range formatMap {
-		tmp := strings.Replace(format, long, short, all)
+		tmp := strings.Replace(format, long, short, flagAll)
 		format = tmp
 	}
 	return format
