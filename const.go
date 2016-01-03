@@ -14,10 +14,11 @@ var Message = map[string]string{
 	"commandDescription": "A command to format Android Logcat",
 	"helpFormat": `Format of output
  - Available keyword:
-   %time, %tag, %priority, %pid, %tid, %message
+     %t (%time), %a (%tag), %p (%priority)
+     %i (%pid), %I (%tid), %m (%message)
  - Example:
    adb logcat -v time | "%time %message"
-   adb logcat -v threadtime | "%time, %tag, %message" > logcat.csv
+   adb logcat -v threadtime | "%t, %a, %p, %i, %I, %m" > logcat.csv
  - Default Format:
    "%time %tag %priority %message"`,
 	"helpTrigger":           "Regex for triggering a command.",
