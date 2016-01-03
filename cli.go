@@ -25,21 +25,22 @@ type CLI struct {
 func (cli *CLI) Run(args []string) int {
 
 	var (
-		parser Parser
-		format = kingpin.Arg("format", Message["helpFormat"]).String()
-
-		// TODO not implemented yet.
-		//trigger = kingpin.Flag("trigger", "Regex for triggering a command.").Short('t').String()
-		//command = kingpin.Flag("command", "Command.").Short('c').String()
+		parser  Parser
+		app     = kingpin.New(Name, Message["commandDescription"])
+		format  = app.Arg("format", Message["helpFormat"]).Default(DefaultFormat).String()
+		trigger = app.Flag("trigger", "Regexp for triggering a command.").Short('t').String()
+		command = app.Flag("command", "command.").Short('c').String()
 	)
 
-	kingpin.CommandLine.HelpFlag.Short('h')
-	kingpin.Version(Version)
-	kingpin.Parse() // parse args here
+	app.HelpFlag.Short('h')
+	app.Version(Version)
+	kingpin.MustParse(app.Parse(args[1:]))
 
-	if *format == "" {
-		*format = DefaultFormat
-	}
+	log.WithFields(log.Fields{
+		"format":  *format,
+		"trigger": *trigger,
+		"command": *command,
+	}).Debug("Parsed")
 
 	for line := range lines.Lines(cli.inStream) {
 		logFormat := FindFormat(line)
@@ -50,9 +51,9 @@ func (cli *CLI) Run(args []string) int {
 		item := parser.Parse(line)
 
 		// output
-		fmt.Println(item.Format(*format))
+		fmt.Fprintln(cli.outStream, item.Format(*format))
 	}
-	log.Println("finished")
+	log.Debugf("finished")
 
 	return ExitCodeOK
 }

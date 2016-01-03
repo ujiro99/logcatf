@@ -70,14 +70,13 @@ func (p *logcatParser) search(line string) map[string]string {
 
 // GetParser create and return parser
 func GetParser(format string) Parser {
-	log.WithFields(log.Fields{"format": format}).Info("set parser type")
 
 	parser, ok := parserCache[format]
-
 	if ok {
 		return parser
 	}
 
+	log.Debugf("create parser: %s", format)
 	parser = &logcatParser{
 		logFormat: format,
 		pattern:   patterns[format],
@@ -88,12 +87,9 @@ func GetParser(format string) Parser {
 
 // FindFormat analyze a line and find out logcat format.
 func FindFormat(line string) string {
-	log.WithFields(log.Fields{"line": line}).Debug("FindFormat start")
-
 	for _, format := range formats {
 		re, ok := patterns[format]
 		if ok && re.MatchString(line) {
-			log.WithFields(log.Fields{"format": format}).Debug("FindFormat finish")
 			return format
 		}
 	}

@@ -14,6 +14,19 @@ func ExampleLogcatItem_Format_time_message() {
 	// 12-28 19:01:14.073, at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)
 }
 
+func ExampleLogcatItem_Format_escapedCharactor() {
+	item := &LogcatItem{
+		"time":     "12-28 19:01:14.073",
+		"tag":      "GLSUser",
+		"priority": "W",
+		"message":  "at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)",
+	}
+	fmt.Println(item.Format("%time\t%tag\t%priority\n%message"))
+	// Output:
+	// 12-28 19:01:14.073	GLSUser	W
+	// at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)
+}
+
 func ExampleLogcatItem_Format_priority_missing() {
 	item := &LogcatItem{
 		"time":    "12-28 19:01:14.073",

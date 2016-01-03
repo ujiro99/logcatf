@@ -11,6 +11,7 @@ const (
 
 // Message has message strings.
 var Message = map[string]string{
+	"commandDescription": "A command to format Android Logcat",
 	"helpFormat": `Format of output
 	- Available keyword:
 	  %time, %tag, %priority, %pid, %tid, %message
