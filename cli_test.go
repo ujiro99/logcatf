@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 )
 
 const (
@@ -33,6 +34,7 @@ func TestRun_formatDefault(t *testing.T) {
 	cli := newCli()
 	cli.inStream = bufio.NewReader(fp)
 	args := strings.Split("./logcatf", " ")
+	//args := []string{"./logcatf", "-o", "SourceFile:135", "-c", "sleep 0.3; say hello"}
 	status := cli.Run(args)
 	if status != ExitCodeOK {
 		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
@@ -127,16 +129,39 @@ func TestRun_execCommand(t *testing.T) {
 	out := new(bytes.Buffer)
 	cli.errStream = out
 
+	time.AfterFunc(time.Second/100, func() {
+		expect := "test"
+		str := out.String()
+		if !strings.Contains(str, expect) {
+			t.Errorf("expected \"%s\" to eq \"%s\"", str, expect)
+		}
+	})
+
 	args := []string{"./logcatf", "%t %i %I %p %a: %m", "-o", "policy loaded", "-c", "echo test"}
 	status := cli.Run(args)
 
 	if status != ExitCodeOK {
 		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
 	}
+}
 
-	expect := "test"
-	str := out.String()
-	if !strings.Contains(str, expect) {
-		t.Errorf("expected \"%s\" to eq \"%s\"", str, expect)
+func TestRun_execCommand_async(t *testing.T) {
+	cli := newCli()
+	cli.inStream = strings.NewReader("12-28 18:54:07.180 0 1 I tag: first line\n12-28 18:54:07.180 0 1 I tag: second line")
+	out := new(bytes.Buffer)
+	cli.outStream = out
+
+	time.AfterFunc(time.Second/10, func() {
+		expect := "second line"
+		if !strings.Contains(out.String(), expect) {
+			t.Error("timeout")
+		}
+	})
+
+	args := []string{"./logcatf", "%t %i %I %p %a: %m", "-o", "first line", "-c", "sleep 0.2;echo finish"}
+	status := cli.Run(args)
+
+	if status != ExitCodeOK {
+		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
 	}
 }

@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"io"
-	"os/exec"
 	"strings"
 
 	"github.com/Maki-Daisuke/go-lines"
 	log "github.com/Sirupsen/logrus"
+	"github.com/codeskyblue/go-sh"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -86,11 +86,19 @@ func (cli *CLI) execCommand(param *CLIParameter, line *string, item *LogcatItem)
 		return
 	}
 	log.Debugf("--command start: \"%s\" on \"%s\"", *param.command, *line)
-	out, err := exec.Command("sh", "-c", *param.command).Output()
+
+	session := sh.NewSession()
+	for k := range formatMap {
+		session.SetEnv(k, (*item)[k])
+	}
+	session.Command("sh", "-c", *param.command)
+	session.Stdout = cli.errStream
+	err := session.Start()
 	if err != nil {
 		log.Error(err)
 	}
-	fmt.Fprintf(cli.errStream, "%s", out)
+	//session.Wait()
+
 	log.Debugf("--command finish: \"%s\"", *param.command)
 }
 
