@@ -26,7 +26,7 @@ Other Flags:
 |------:|---------------------:|
 |   %a  | left-align           |
 |  %8a  | width 8, right-align |
-| %-8a  | left-align           |
+| %-8a  | width 8, left-align  |
 
 
 Default Format:
@@ -37,13 +37,15 @@ Default Format:
 
 You can execute a command when a keyword  matched to Logcat.
 
-    -o, --on=ON            regex to trigger a COMMAND.
-    -c, --command=COMMAND  COMMAND will be executed on regex matched.
-                           In COMMAND, you can use parsed logcat as shell variables.
+    -o, --on=ON              regex to trigger a COMMAND.
+    -c, --command=COMMAND    COMMAND will be executed on regex matched.
+                             In COMMAND, you can use parsed logcat as shell variables.
 
     ex) -o "MY_APP.*Error" -c "echo \${message} > error.log"
 
-    * You need to escape a dollar sign.
+    ** You need to escape a dollar sign.
+
+Command's stdout is redirected to stderr of logcatf.
 
 
 ## Examples
@@ -56,13 +58,17 @@ $ adb logcat -v time | logcatf "%time %4i %message"
 $ adb logcat -v threadtime | logcatf "%t, %a, %p, %i, %I, %m" > logcat.csv
 
 # get screencap on Exception
-$ adb logcat -v threadtime | logcatf "%t %m" -o "MY_APP.*Error" -c "adb shell screencap -p /sdcard/a.png"
+$ adb logcat -v time | logcatf "%t %m" -o "MY_APP.*Error" -c "adb shell screencap -p /sdcard/a.png"
 ```
 
 
 ## Install
 
-To install, use `go get`:
+You can get binary from github release page.
+
+[Release Page](https://github.com/ujiro99/logcatf/releases)
+
+or, use `go get`:
 
 ```bash
 $ go get github.com/Ujiro99/logcatf
