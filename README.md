@@ -56,7 +56,7 @@ $ adb logcat -v time | logcatf "%time %message"
 $ adb logcat -v threadtime | logcatf "%t, %a, %p, %i, %I, %m" > logcat.csv
 
 # get screencap on Exception
-$ adb logcat -v threadtime | "%t %m" -o "MY_APP.*Error" -c "adb shell screencap -p /sdcard/a.png"
+$ adb logcat -v threadtime | logcatf "%t %m" -o "MY_APP.*Error" -c "adb shell screencap -p /sdcard/a.png"
 ```
 
 
