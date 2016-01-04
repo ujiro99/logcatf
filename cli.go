@@ -5,8 +5,8 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"regexp"
 	"runtime"
-	"strings"
 
 	"github.com/Maki-Daisuke/go-lines"
 	log "github.com/Sirupsen/logrus"
@@ -28,6 +28,7 @@ type CLI struct {
 	inStream             io.Reader
 	outStream, errStream io.Writer
 	eventFunc            EventFunc
+	eventTrigger         *regexp.Regexp
 }
 
 // CLIParameter represents parameters to execute command.
@@ -85,7 +86,7 @@ func (cli *CLI) execCommandNot(param *CLIParameter, line *string, item *LogcatIt
 
 // execute command if
 func (cli *CLI) execCommand(param *CLIParameter, line *string, item *LogcatItem) {
-	if !strings.Contains(*line, *param.trigger) {
+	if !cli.eventTrigger.MatchString(*line) {
 		return
 	}
 	log.Debugf("--command start: \"%s\" on \"%s\"", *param.command, *line)
@@ -127,6 +128,7 @@ func (cli *CLI) initParameter(args []string) *CLIParameter {
 		cli.eventFunc = cli.execCommandNot
 	} else {
 		cli.eventFunc = cli.execCommand
+		cli.eventTrigger = regexp.MustCompile(*trigger)
 	}
 
 	log.WithFields(log.Fields{"format": *format, "trigger": *trigger, "command": *command}).Debug("Parameter initialized.")
