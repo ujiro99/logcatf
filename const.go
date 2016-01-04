@@ -23,7 +23,7 @@ var Message = map[string]string{
  - Default Format:
    "%time %tag %priority %message"`,
 	"helpTrigger":           "regex to trigger a COMMAND.",
-	"helpCommand":           "COMMAND will be executed on regex mathed. In COMMAND, you can use parsed logcat as shell variables. ex) `\\${message}` You need escape a back slash.",
+	"helpCommand":           "COMMAND will be executed on regex mathed. In COMMAND, you can use parsed logcat as shell variables. ex) `\\${message}` You need to escape a dollar mark.",
 	"msgUnavailableKeyword": "error: %s is not available. Please check `Availavle Keyword:` on help.",
 	"msgDuplicatedKeyword":  "error: %s or %s is duplicated.",
 }
