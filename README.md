@@ -20,6 +20,14 @@ Available Format:
 |   %I   | %tid      |
 |   %m   | %message  |
 
+Other Flags:
+
+|  Flag | description |
+|------:|---------------------:|
+|   %a  | left-align           |
+|  %8a  | width 8, right-align |
+| %-8a  | left-align           |
+
 
 Default Format:
 
@@ -48,7 +56,7 @@ $ adb logcat -v time | logcatf "%time %message"
 $ adb logcat -v threadtime | logcatf "%t, %a, %p, %i, %I, %m" > logcat.csv
 
 # get screencap on Exception
-$ adb logcat -v threadtime | "%t %m" -o "MY_APP.*Error" -c "adb shell screencap -p /sdcard/a.png"
+$ adb logcat -v threadtime | logcatf "%t %m" -o "MY_APP.*Error" -c "adb shell screencap -p /sdcard/a.png"
 ```
 
 
