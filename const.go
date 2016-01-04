@@ -17,9 +17,9 @@ var Message = map[string]string{
      %t (%time), %a (%tag), %p (%priority)
      %i (%pid), %I (%tid), %m (%message)
  - Example:
-   adb logcat -v time | "%time %message"
-   adb logcat -v threadtime | "%t, %a, %p, %i, %I, %m" > logcat.csv
-   adb logcat -v threadtime | "%t %m" -o "Exception" -c "echo \$tag"
+   adb logcat -v time | logcatf "%time %message"
+   adb logcat -v threadtime | logcatf "%t, %a, %m" > logcat.csv
+   adb logcat -v threadtime | logcatf "%t" -o "Exception" -c "adb shell screencap -p /data/local/tmp/screen.png"
  - Default Format:
    "%time %tag %priority %message"`,
 	"helpTrigger":           "regex to trigger a COMMAND.",
