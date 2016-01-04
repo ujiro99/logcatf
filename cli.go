@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"io"
+	"os/exec"
+	"strings"
 
 	"github.com/Maki-Daisuke/go-lines"
 	log "github.com/Sirupsen/logrus"
@@ -15,10 +17,15 @@ const (
 	ExitCodeError int = 1 + iota
 )
 
+// EventFunc watches logcat line.
+// if line contains param.trigger, exec param.command.
+type EventFunc func(param *CLIParameter, line *string, item *LogcatItem)
+
 // CLI is the command line object
 type CLI struct {
 	inStream             io.Reader
 	outStream, errStream io.Writer
+	eventFunc            EventFunc
 }
 
 // CLIParameter represents parameters to execute command.
@@ -37,8 +44,8 @@ func init() {
 // Run invokes the CLI with the given arguments.
 func (cli *CLI) Run(args []string) int {
 
-	cliParam := initParameter(args)
-	err := verifyParameter(cliParam)
+	param := cli.initParameter(args)
+	err := cli.verifyParameter(param)
 	if err != nil {
 		fmt.Fprintln(cli.errStream, err.Error())
 		log.Debug(err.Error())
@@ -46,24 +53,48 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	// convert format (long => short)
-	normalized := formatter.Normarize(*cliParam.format)
-	cliParam.format = &normalized
+	normalized := formatter.Normarize(*param.format)
+	param.format = &normalized
 
-	// exec parse and format
 	for line := range lines.Lines(cli.inStream) {
-		item := Parse(line)
-		if item == nil {
-			continue
-		}
-		output := formatter.Format(*cliParam.format, &item)
-		fmt.Fprintln(cli.outStream, output)
+		item := cli.parseLine(param, line)
+		cli.eventFunc(param, &line, &item)
 	}
 
 	log.Debugf("finished")
 	return ExitCodeOK
 }
 
-func initParameter(args []string) *CLIParameter {
+// exec parse and format
+func (cli *CLI) parseLine(param *CLIParameter, line string) LogcatItem {
+	item := Parse(line)
+	if item == nil {
+		return nil
+	}
+	output := formatter.Format(*param.format, &item)
+	fmt.Fprintln(cli.outStream, output)
+	return item
+}
+
+// dont execute command.
+func (cli *CLI) execCommandNot(param *CLIParameter, line *string, item *LogcatItem) {
+}
+
+// execute command if
+func (cli *CLI) execCommand(param *CLIParameter, line *string, item *LogcatItem) {
+	if !strings.Contains(*line, *param.trigger) {
+		return
+	}
+	log.Debugf("--command start: \"%s\" on \"%s\"", *param.command, *line)
+	out, err := exec.Command("sh", "-c", *param.command).Output()
+	if err != nil {
+		log.Error(err)
+	}
+	fmt.Fprintf(cli.errStream, "%s", out)
+	log.Debugf("--command finish: \"%s\"", *param.command)
+}
+
+func (cli *CLI) initParameter(args []string) *CLIParameter {
 	// setup kingpin & parse args
 	var (
 		app     = kingpin.New(Name, Message["commandDescription"])
@@ -75,7 +106,14 @@ func initParameter(args []string) *CLIParameter {
 	app.Version(Version)
 	kingpin.MustParse(app.Parse(args[1:]))
 
-	log.WithFields(log.Fields{"format": *format, "trigger": *trigger, "command": *command}).Debug("Cli Parameter initialized.")
+	// if trigger not exists, not execute anything.
+	if *trigger == "" {
+		cli.eventFunc = cli.execCommandNot
+	} else {
+		cli.eventFunc = cli.execCommand
+	}
+
+	log.WithFields(log.Fields{"format": *format, "trigger": *trigger, "command": *command}).Debug("Parameter initialized.")
 	return &CLIParameter{
 		format:  format,
 		trigger: trigger,
@@ -83,6 +121,6 @@ func initParameter(args []string) *CLIParameter {
 	}
 }
 
-func verifyParameter(param *CLIParameter) error {
+func (cli *CLI) verifyParameter(param *CLIParameter) error {
 	return formatter.Verify(*param.format)
 }
