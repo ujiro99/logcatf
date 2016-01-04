@@ -20,6 +20,14 @@ Available Format:
 |   %I   | %tid      |
 |   %m   | %message  |
 
+Other Flags:
+
+|  Flag | description |
+|------:|---------------------:|
+|   %a  | left-align           |
+|  %8a  | width 8, right-align |
+| %-8a  | left-align           |
+
 
 Default Format:
 
