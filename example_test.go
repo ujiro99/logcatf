@@ -50,3 +50,16 @@ func ExampleLogcatItem_Format_all() {
 	// Output:
 	// 12-28 19:01:14.073, GLSUser, 1836, 2720, W, at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)
 }
+
+func ExampleLogcatItem_Format_remainFrags() {
+	item := &LogcatItem{
+		"time":     "12-28 19:01:14.073",
+		"pid":      "1",
+		"tid":      "2",
+		"priority": "W",
+		"tag":      "Tag",
+	}
+	fmt.Println(formatter.Format("%t, %8a, %4i, %-4I,%2p", item))
+	// Output:
+	// 12-28 19:01:14.073,      Tag,    1, 2   , W
+}

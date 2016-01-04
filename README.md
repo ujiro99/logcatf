@@ -30,11 +30,11 @@ Default Format:
 You can execute a command when a keyword  matched to Logcat.
 
     -o, --on=ON            regex to trigger a COMMAND.
-    -c, --command=COMMAND  COMMAND will be executed on regex mathed. 
-                           In COMMAND, you can use parsed logcat as shell variables. 
-                         
-    ex) -o "MY_APP.*Error" -c "echo \${message} > error.log" 
-    
+    -c, --command=COMMAND  COMMAND will be executed on regex matched.
+                           In COMMAND, you can use parsed logcat as shell variables.
+
+    ex) -o "MY_APP.*Error" -c "echo \${message} > error.log"
+
     * You need to escape a dollar sign.
 
 

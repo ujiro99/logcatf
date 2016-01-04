@@ -9,8 +9,9 @@ import (
 const flagAll = -1
 
 var (
-	formatRegex  = regexp.MustCompile(`%(time)|%(pid)|%(tid)|%(priority)|%(tag)|%(message)`)
-	sformatRegex = regexp.MustCompile(`%(t)|%(i)|%(I)|%(p)|%(a)|%(m)`)
+	formatRegex  = regexp.MustCompile(`%.*?(time|pid|tid|priority|tag|message)`)
+	sformatRegex = regexp.MustCompile(`%.*?(t|i|I|p|a|m)`)
+	flagRegex    = regexp.MustCompile(`t|i|I|p|a|m`)
 	formatMap    = map[string]string{
 		"time":     "t",
 		"pid":      "i",
@@ -23,9 +24,11 @@ var (
 
 // Formatter of logcatItem
 type Formatter interface {
+	// Format create a formatted string.
 	Format(format string, item *LogcatItem) string
+	// Verify checks a format
 	Verify(format string) error
-	// convert long keys in format to short keys.
+	// Normarize convert long keys to short keys.
 	Normarize(format string) string
 }
 
@@ -41,7 +44,7 @@ func (f *logcatFormatter) Format(format string, item *LogcatItem) string {
 }
 
 // replace keyword to real value. use short format.
-// ex) "%t %p" => "12-28 19:01:14.073 GLSUser"
+// ex) "%t %a" => "12-28 19:01:14.073 GLSUser"
 func (f *logcatFormatter) replaceKeyword(format string, item *LogcatItem) string {
 	matches := sformatRegex.FindAllStringSubmatch(format, len(formatMap))
 	formatArgs := make([]interface{}, 0, len(matches))
@@ -55,7 +58,9 @@ func (f *logcatFormatter) replaceKeyword(format string, item *LogcatItem) string
 			}
 		}
 	}
-	format = sformatRegex.ReplaceAllString(format, "%s")
+	format = sformatRegex.ReplaceAllStringFunc(format, func(str string) string {
+		return flagRegex.ReplaceAllString(str, "s")
+	})
 	return fmt.Sprintf(format, formatArgs...)
 }
 
