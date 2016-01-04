@@ -9,7 +9,7 @@ A Command line tool to format Android Logcat.
 $ adb logcat -v time | logcatf "%t, %m"
 ```
 
-Available Keyword:
+Available Format:
 
 | format | long ver. |
 |:------:|:---------:|
@@ -21,7 +21,24 @@ Available Keyword:
 |   %m   | %message  |
 
 
-Example:
+Default Format:
+
+    "%time %tag %priority %message"
+
+## Other options
+
+You can execute a command when a keyword  matched to Logcat.
+
+    -o, --on=ON            regex to trigger a COMMAND.
+    -c, --command=COMMAND  COMMAND will be executed on regex mathed. 
+                           In COMMAND, you can use parsed logcat as shell variables. 
+                         
+    ex) -o "MY_APP.*Error" -c "echo \${message} > error.log" 
+    
+    * You need to escape a dollar sign.
+
+
+## Examples
 
 ```bash
 # show only time and message.
@@ -29,11 +46,11 @@ $ adb logcat -v time | logcatf "%time %message"
 
 # output to csv format.
 $ adb logcat -v threadtime | logcatf "%t, %a, %p, %i, %I, %m" > logcat.csv
+
+# get screencap on Exception
+$ adb logcat -v threadtime | "%t %m" -o "MY_APP.*Error" -c "adb shell screencap -p /sdcard/a.png"
 ```
 
-Default Format:
-
-    "%time %tag %priority %message"
 
 ## Install
 
