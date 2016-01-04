@@ -50,7 +50,7 @@ You can execute a command when a keyword  matched to Logcat.
 
 ```bash
 # show only time and message.
-$ adb logcat -v time | logcatf "%time %message"
+$ adb logcat -v time | logcatf "%time %4i %message"
 
 # output to csv format.
 $ adb logcat -v threadtime | logcatf "%t, %a, %p, %i, %I, %m" > logcat.csv

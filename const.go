@@ -17,7 +17,7 @@ var Message = map[string]string{
      %t (%time), %a (%tag), %p (%priority)
      %i (%pid), %I (%tid), %m (%message)
  - Example:
-   adb logcat -v time | logcatf "%time %message"
+   adb logcat -v time | logcatf "%t %4i %m"
    adb logcat -v threadtime | logcatf "%t, %a, %m" > logcat.csv
    adb logcat -v threadtime | logcatf "%t" -o "Exception" -c "adb shell screencap -p /data/local/tmp/screen.png"
  - Default Format:
