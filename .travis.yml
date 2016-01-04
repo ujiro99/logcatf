@@ -3,8 +3,14 @@ sudo: false
 go:
   - tip
 before_install:
+  - go get github.com/mitchellh/gox
+  - gox -build-toolchain
+  - go get github.com/tcnksm/ghr
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
   - if ! go get github.com/golang/tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
 script:
   - $HOME/gopath/bin/goveralls -service=travis-ci
+after_success:
+  - gox -output "dist/{.OS}_{.Arch}_{.Dir}"
+  - ghr --username ujiro99 --token $GITHUB_TOKEN --replace --prerelease pre-release dist/
