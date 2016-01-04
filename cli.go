@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"io"
+	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 
 	"github.com/Maki-Daisuke/go-lines"
 	log "github.com/Sirupsen/logrus"
-	"github.com/codeskyblue/go-sh"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -56,12 +58,13 @@ func (cli *CLI) Run(args []string) int {
 	normalized := formatter.Normarize(*param.format)
 	param.format = &normalized
 
+	// let's start
 	for line := range lines.Lines(cli.inStream) {
 		item := cli.parseLine(param, line)
 		cli.eventFunc(param, &line, &item)
 	}
 
-	log.Debugf("finished")
+	log.Debugf("run finished")
 	return ExitCodeOK
 }
 
@@ -87,17 +90,22 @@ func (cli *CLI) execCommand(param *CLIParameter, line *string, item *LogcatItem)
 	}
 	log.Debugf("--command start: \"%s\" on \"%s\"", *param.command, *line)
 
-	session := sh.NewSession()
 	for k := range formatMap {
-		session.SetEnv(k, (*item)[k])
+		os.Setenv(k, (*item)[k])
 	}
-	session.Command("sh", "-c", *param.command)
-	session.Stdout = cli.errStream
-	err := session.Start()
+
+	var cmd *exec.Cmd
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command(os.Getenv("COMSPEC"), "/c", *param.command)
+	} else {
+		cmd = exec.Command(os.Getenv("SHELL"), "-c", *param.command)
+	}
+	cmd.Stdout = cli.errStream
+	err := cmd.Start()
 	if err != nil {
 		log.Error(err)
 	}
-	//session.Wait()
+	// cmd.Wait()
 
 	log.Debugf("--command finish: \"%s\"", *param.command)
 }

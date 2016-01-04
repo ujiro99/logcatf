@@ -129,19 +129,17 @@ func TestRun_execCommand(t *testing.T) {
 	out := new(bytes.Buffer)
 	cli.errStream = out
 
-	time.AfterFunc(time.Second/100, func() {
-		expect := "test"
-		str := out.String()
-		if !strings.Contains(str, expect) {
-			t.Errorf("expected \"%s\" to eq \"%s\"", str, expect)
-		}
-	})
-
 	args := []string{"./logcatf", "%t %i %I %p %a: %m", "-o", "policy loaded", "-c", "echo test"}
 	status := cli.Run(args)
-
 	if status != ExitCodeOK {
 		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
+	}
+
+	<-time.After(time.Second / 10)
+	expect := "test"
+	str := out.String()
+	if !strings.Contains(str, expect) {
+		t.Errorf("expected \"%s\" to eq \"%s\"", str, expect)
 	}
 }
 
@@ -151,17 +149,36 @@ func TestRun_execCommand_async(t *testing.T) {
 	out := new(bytes.Buffer)
 	cli.outStream = out
 
-	time.AfterFunc(time.Second/10, func() {
-		expect := "second line"
-		if !strings.Contains(out.String(), expect) {
-			t.Error("timeout")
-		}
-	})
-
-	args := []string{"./logcatf", "%t %i %I %p %a: %m", "-o", "first line", "-c", "sleep 0.2;echo finish"}
+	args := []string{"./logcatf", "%t %i %I %p %a: %m", "-o", "first line", "-c", "sleep 0.2; echo finish"}
 	status := cli.Run(args)
-
 	if status != ExitCodeOK {
 		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
 	}
+
+	<-time.After(time.Second / 10)
+	expect := "second line"
+	if !strings.Contains(out.String(), expect) {
+		t.Error("command did not works asynchronously")
+	}
+}
+
+func TestRun_execCommand_outputParsed(t *testing.T) {
+	cli := newCli()
+	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I auditd  : type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295")
+	err := new(bytes.Buffer)
+	cli.errStream = err
+
+	args := []string{"./logcatf", "-o", "policy loaded", "-c", "echo parsed: $time"}
+	status := cli.Run(args)
+	if status != ExitCodeOK {
+		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
+	}
+
+	<-time.After(time.Second / 10)
+	expect := "parsed: 12-28 18:54:07.180"
+	str := err.String()
+	if !strings.Contains(str, expect) {
+		t.Errorf("$time was not expanded.")
+	}
+
 }
