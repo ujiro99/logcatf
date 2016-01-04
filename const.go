@@ -19,10 +19,11 @@ var Message = map[string]string{
  - Example:
    adb logcat -v time | "%time %message"
    adb logcat -v threadtime | "%t, %a, %p, %i, %I, %m" > logcat.csv
+   adb logcat -v threadtime | "%t %m" -o "Exception" -c "echo \$tag"
  - Default Format:
    "%time %tag %priority %message"`,
-	"helpTrigger":           "Regex for triggering a command.",
-	"helpCommand":           "Command to be executed.",
+	"helpTrigger":           "regex to trigger a COMMAND.",
+	"helpCommand":           "COMMAND will be executed on regex mathed. In COMMAND, you can use parsed logcat as shell variables. ex) `\\${message}` You need escape a back slash.",
 	"msgUnavailableKeyword": "error: %s is not available. Please check `Availavle Keyword:` on help.",
 	"msgDuplicatedKeyword":  "error: %s or %s is duplicated.",
 }
