@@ -33,12 +33,12 @@ type Formatter interface {
 }
 
 // implements Formatter
-type logcatFormatter struct{}
+type defaultFormatter struct{}
 
 // Format implements Formatter
 // replace %* keywords to real value. use short format.
 //   ex) "%t %a" => "12-28 19:01:14.073 GLSUser"
-func (f *logcatFormatter) Format(format string, item *LogcatItem) string {
+func (f *defaultFormatter) Format(format string, item *LogcatItem) string {
 	matches := sformatRegex.FindAllStringSubmatch(format, len(formatMap))
 	formatArgs := make([]interface{}, 0, len(matches))
 	// find matched keyword and store value on item
@@ -58,7 +58,7 @@ func (f *logcatFormatter) Format(format string, item *LogcatItem) string {
 }
 
 // Verify implements Formatter
-func (f *logcatFormatter) Verify(format string) error {
+func (f *defaultFormatter) Verify(format string) error {
 	err := ParameterError{}
 	var msg []string
 	msg = f.verifyUnabailavleKeyword(format)
@@ -75,7 +75,7 @@ func (f *logcatFormatter) Verify(format string) error {
 	return &err
 }
 
-func (f *logcatFormatter) verifyUnabailavleKeyword(format string) []string {
+func (f *defaultFormatter) verifyUnabailavleKeyword(format string) []string {
 	// find unavailable keyword.
 	removed := formatRegex.ReplaceAllString(format, "")
 	removed = sformatRegex.ReplaceAllString(removed, "")
@@ -95,7 +95,7 @@ func (f *logcatFormatter) verifyUnabailavleKeyword(format string) []string {
 	return msgs
 }
 
-func (f *logcatFormatter) verifyDuplicatedKeyword(format string) []string {
+func (f *defaultFormatter) verifyDuplicatedKeyword(format string) []string {
 	// find unavailable keyword.
 	duplicated := [][]string{}
 	for k, v := range formatMap {
@@ -133,14 +133,14 @@ func (e *ParameterError) Error() string {
 }
 
 // Normarize implements Formatter
-func (f *logcatFormatter) Normarize(format string) string {
+func (f *defaultFormatter) Normarize(format string) string {
 	for long, short := range formatMap {
 		format = strings.Replace(format, long, short, flagAll)
 	}
 	return f.replaceEscape(format)
 }
 
-func (f *logcatFormatter) replaceEscape(format string) string {
+func (f *defaultFormatter) replaceEscape(format string) string {
 	result := format
 	result = strings.Replace(result, "\\t", "\t", flagAll)
 	result = strings.Replace(result, "\\n", "\n", flagAll)

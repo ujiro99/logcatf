@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 )
 
 func ExampleLogcatItem_Format_time_message() {
@@ -62,4 +63,18 @@ func ExampleLogcatItem_Format_remainFrags() {
 	fmt.Println(formatter.Format("%t, %8a, %4i, %-4I,%2p", item))
 	// Output:
 	// 12-28 19:01:14.073,      Tag,    1, 2   , W
+}
+
+func ExampleLogcatItem_Format_toCsv() {
+	item := &LogcatItem{
+		"pid":     "1",
+		"message": "aaa\"bbb\"ccc",
+	}
+
+	cli := newCli()
+	cli.outStream = os.Stdout
+	f := csvFormatter{Cli: cli}
+	fmt.Println(f.Format("%m %i", item))
+	// Output:
+	// "aaa""bbb""ccc",1
 }

@@ -4,7 +4,17 @@ import (
 	"regexp"
 
 	log "github.com/Sirupsen/logrus"
+	iconv "github.com/djimenez/iconv-go"
 )
+
+// Parser parse logcat to struct.
+type Parser interface {
+	Parse(line string) LogcatItem
+}
+
+type logcatParser struct {
+	encode *string
+}
 
 var (
 	// logcat formats.
@@ -31,31 +41,43 @@ var (
 	}
 )
 
+func NewParser(encode *string) Parser {
+	if encode == nil || *encode == "" {
+		encode = &UTF8
+	}
+	return &logcatParser{encode: encode}
+}
+
 // Parse a line of logcat.
-func Parse(line string) LogcatItem {
-	logFormat := findFormat(line)
+func (p *logcatParser) Parse(line string) LogcatItem {
+	logFormat := p.findFormat(line)
 	if logFormat == "" {
 		log.Warnf("Parse failed: %s", line)
 		return nil
 	}
-	item := search(line, patterns[logFormat])
+	item := p.search(line, patterns[logFormat])
 	return item
 }
 
 // search keyword using regex pattern.
-func search(line string, pattern *regexp.Regexp) LogcatItem {
+func (p *logcatParser) search(line string, pattern *regexp.Regexp) LogcatItem {
 	match := pattern.FindStringSubmatch(line)
 	item := LogcatItem{}
 	for i, key := range pattern.SubexpNames() {
 		if i != 0 {
-			item[key] = match[i]
+			s, err := iconv.ConvertString(match[i], UTF8, *p.encode)
+			if err != nil {
+				item[key] = s
+			} else {
+				item[key] = match[i]
+			}
 		}
 	}
 	return item
 }
 
 // findFormat analyze a line and find out logcat format.
-func findFormat(line string) string {
+func (p *logcatParser) findFormat(line string) string {
 	for _, format := range formats {
 		re, ok := patterns[format]
 		if ok && re.MatchString(line) {

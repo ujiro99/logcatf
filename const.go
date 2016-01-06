@@ -24,6 +24,13 @@ var Message = map[string]string{
    "%time %tag %priority %message"`,
 	"helpTrigger":           "regex to trigger a COMMAND.",
 	"helpCommand":           "COMMAND will be executed on regex mathed. In COMMAND, you can use parsed logcat as shell variables. ex) `\\${message}` You need to escape a dollar mark.",
+	"helpEncode":            "output character encode.",
+	"helpToCsv":             "output to CSV format. double-quote will be escaped.",
 	"msgUnavailableKeyword": "error: %s is not available. Please check `Availavle Keyword:` on help.",
 	"msgDuplicatedKeyword":  "error: %s or %s is duplicated.",
 }
+
+var (
+	// UTF8 represents encode `utf-8`
+	UTF8 = "utf-8"
+)

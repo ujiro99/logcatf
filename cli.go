@@ -35,13 +35,14 @@ type CLI struct {
 type CLIParameter struct {
 	format,
 	trigger,
-	command *string
+	command,
+	encode *string
 }
 
 var formatter Formatter
+var parser Parser
 
 func init() {
-	formatter = &logcatFormatter{}
 }
 
 // Run invokes the CLI with the given arguments.
@@ -67,7 +68,7 @@ func (cli *CLI) Run(args []string) int {
 
 // exec parse and format
 func (cli *CLI) parseLine(param *CLIParameter, line string) LogcatItem {
-	item := Parse(line)
+	item := parser.Parse(line)
 	if item == nil {
 		return nil
 	}
@@ -114,6 +115,8 @@ func (cli *CLI) initParameter(args []string) *CLIParameter {
 		format  = app.Arg("format", Message["helpFormat"]).Default(DefaultFormat).String()
 		trigger = app.Flag("on", Message["helpTrigger"]).Short('o').String()
 		command = app.Flag("command", Message["helpCommand"]).Short('c').String()
+		encode  = app.Flag("encode", Message["helpEncode"]).String()
+		toCsv   = app.Flag("toCsv", Message["helpToCsv"]).Bool()
 	)
 	app.HelpFlag.Short('h')
 	app.Version(Version)
@@ -127,9 +130,16 @@ func (cli *CLI) initParameter(args []string) *CLIParameter {
 		cli.eventTrigger = regexp.MustCompile(*trigger)
 	}
 
+	if *toCsv {
+		formatter = &csvFormatter{Cli: cli}
+	} else {
+		formatter = &defaultFormatter{}
+	}
+
 	// convert format (long => short)
 	normarized := formatter.Normarize(*format)
 	format = &normarized
+	parser = NewParser(encode)
 
 	log.WithFields(log.Fields{"format": *format, "trigger": *trigger, "command": *command}).Debug("Parameter initialized.")
 	return &CLIParameter{
