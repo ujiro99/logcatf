@@ -3,8 +3,8 @@ package main
 import (
 	"regexp"
 
+	mahonia "code.google.com/p/mahonia"
 	log "github.com/Sirupsen/logrus"
-	iconv "github.com/djimenez/iconv-go"
 )
 
 // Parser parse logcat to struct.
@@ -41,6 +41,7 @@ var (
 	}
 )
 
+// NewParser create initialized Parser.
 func NewParser(encode *string) Parser {
 	if encode == nil || *encode == "" {
 		encode = &UTF8
@@ -65,12 +66,7 @@ func (p *logcatParser) search(line string, pattern *regexp.Regexp) LogcatItem {
 	item := LogcatItem{}
 	for i, key := range pattern.SubexpNames() {
 		if i != 0 {
-			s, err := iconv.ConvertString(match[i], UTF8, *p.encode)
-			if err != nil {
-				item[key] = s
-			} else {
-				item[key] = match[i]
-			}
+			item[key] = mahonia.NewDecoder(*p.encode).ConvertString(match[i])
 		}
 	}
 	return item
