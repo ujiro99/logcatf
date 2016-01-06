@@ -55,10 +55,6 @@ func (cli *CLI) Run(args []string) int {
 		return ExitCodeError
 	}
 
-	// convert format (long => short)
-	normalized := formatter.Normarize(*param.format)
-	param.format = &normalized
-
 	// let's start
 	for line := range lines.Lines(cli.inStream) {
 		item := cli.parseLine(param, line)
@@ -130,6 +126,10 @@ func (cli *CLI) initParameter(args []string) *CLIParameter {
 		cli.eventFunc = cli.execCommand
 		cli.eventTrigger = regexp.MustCompile(*trigger)
 	}
+
+	// convert format (long => short)
+	normarized := formatter.Normarize(*format)
+	format = &normarized
 
 	log.WithFields(log.Fields{"format": *format, "trigger": *trigger, "command": *command}).Debug("Parameter initialized.")
 	return &CLIParameter{

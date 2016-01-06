@@ -36,16 +36,9 @@ type Formatter interface {
 type logcatFormatter struct{}
 
 // Format implements Formatter
+// replace %* keywords to real value. use short format.
+//   ex) "%t %a" => "12-28 19:01:14.073 GLSUser"
 func (f *logcatFormatter) Format(format string, item *LogcatItem) string {
-	result := format
-	result = f.replaceKeyword(result, item)
-	result = f.replaceEscape(result)
-	return result
-}
-
-// replace keyword to real value. use short format.
-// ex) "%t %a" => "12-28 19:01:14.073 GLSUser"
-func (f *logcatFormatter) replaceKeyword(format string, item *LogcatItem) string {
 	matches := sformatRegex.FindAllStringSubmatch(format, len(formatMap))
 	formatArgs := make([]interface{}, 0, len(matches))
 	// find matched keyword and store value on item
@@ -62,13 +55,6 @@ func (f *logcatFormatter) replaceKeyword(format string, item *LogcatItem) string
 		return flagRegex.ReplaceAllString(str, "s")
 	})
 	return fmt.Sprintf(format, formatArgs...)
-}
-
-func (f *logcatFormatter) replaceEscape(format string) string {
-	result := format
-	result = strings.Replace(result, "\\t", "\t", flagAll)
-	result = strings.Replace(result, "\\n", "\n", flagAll)
-	return result
 }
 
 // Verify implements Formatter
@@ -111,10 +97,9 @@ func (f *logcatFormatter) verifyUnabailavleKeyword(format string) []string {
 
 func (f *logcatFormatter) verifyDuplicatedKeyword(format string) []string {
 	// find unavailable keyword.
-	str := f.Normarize(format)
 	duplicated := [][]string{}
 	for k, v := range formatMap {
-		count := strings.Count(str, "%"+v)
+		count := strings.Count(format, "%"+v)
 		if count > 1 {
 			duplicated = append(duplicated, []string{k, v})
 		}
@@ -152,7 +137,14 @@ func (f *logcatFormatter) Normarize(format string) string {
 	for long, short := range formatMap {
 		format = strings.Replace(format, long, short, flagAll)
 	}
-	return format
+	return f.replaceEscape(format)
+}
+
+func (f *logcatFormatter) replaceEscape(format string) string {
+	result := format
+	result = strings.Replace(result, "\\t", "\t", flagAll)
+	result = strings.Replace(result, "\\n", "\n", flagAll)
+	return result
 }
 
 // TODO find out generic api for find key.
