@@ -10,6 +10,8 @@ import (
 
 	"github.com/Maki-Daisuke/go-lines"
 	log "github.com/Sirupsen/logrus"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -35,12 +37,14 @@ type CLI struct {
 type CLIParameter struct {
 	format,
 	trigger,
-	command,
-	encode *string
+	command *string
 }
 
-var formatter Formatter
-var parser Parser
+var (
+	formatter Formatter
+	parser    Parser
+	writer    io.Writer
+)
 
 func init() {
 }
@@ -73,7 +77,7 @@ func (cli *CLI) parseLine(param *CLIParameter, line string) LogcatItem {
 		return nil
 	}
 	output := formatter.Format(*param.format, &item)
-	fmt.Fprintln(cli.outStream, output)
+	fmt.Fprintln(writer, output)
 	return item
 }
 
@@ -131,15 +135,21 @@ func (cli *CLI) initParameter(args []string) *CLIParameter {
 	}
 
 	if *toCsv {
-		formatter = &csvFormatter{Cli: cli}
+		formatter = &csvFormatter{}
 	} else {
 		formatter = &defaultFormatter{}
+	}
+
+	if *encode == "shift-jis" {
+		writer = transform.NewWriter(cli.outStream, japanese.ShiftJIS.NewEncoder())
+	} else {
+		writer = cli.outStream
 	}
 
 	// convert format (long => short)
 	normarized := formatter.Normarize(*format)
 	format = &normarized
-	parser = NewParser(encode)
+	parser = &logcatParser{}
 
 	log.WithFields(log.Fields{"format": *format, "trigger": *trigger, "command": *command}).Debug("Parameter initialized.")
 	return &CLIParameter{

@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 	"os"
 	"strings"
 	"testing"
@@ -181,4 +183,31 @@ func TestRun_execCommand_outputParsed(t *testing.T) {
 		t.Errorf("$time was not expanded.")
 	}
 
+}
+
+func TestRun_encode_shiftjis(t *testing.T) {
+	cli := newCli()
+	cli.inStream = strings.NewReader("12-28 18:54:07.180     0     1 I logcat_messages:テスト")
+	out := new(bytes.Buffer)
+	cli.outStream = out
+
+	args := strings.Split(`./logcatf "%m" --encode shift-jis`, " ")
+	status := cli.Run(args)
+
+	if status == ExitCodeError {
+		t.Errorf("expected %d to eq %d", status, ExitCodeError)
+	}
+
+	str := out.String()
+	expect := toShiftJis("logcat_messages:テスト")
+	if !strings.Contains(str, expect) {
+		t.Errorf("expected \"%s\" to eq \"%s\"", str, expect)
+	}
+}
+
+func toShiftJis(str string) string {
+	buf := new(bytes.Buffer)
+	w := transform.NewWriter(buf, japanese.ShiftJIS.NewEncoder())
+	w.Write([]byte(str))
+	return buf.String()
 }

@@ -1,10 +1,8 @@
 package main
 
 import (
-	"regexp"
-
-	mahonia "code.google.com/p/mahonia"
 	log "github.com/Sirupsen/logrus"
+	"regexp"
 )
 
 // Parser parse logcat to struct.
@@ -12,9 +10,8 @@ type Parser interface {
 	Parse(line string) LogcatItem
 }
 
-type logcatParser struct {
-	encode *string
-}
+// logcatParser implements Parser
+type logcatParser struct{}
 
 var (
 	// logcat formats.
@@ -41,14 +38,6 @@ var (
 	}
 )
 
-// NewParser create initialized Parser.
-func NewParser(encode *string) Parser {
-	if encode == nil || *encode == "" {
-		encode = &UTF8
-	}
-	return &logcatParser{encode: encode}
-}
-
 // Parse a line of logcat.
 func (p *logcatParser) Parse(line string) LogcatItem {
 	logFormat := p.findFormat(line)
@@ -66,7 +55,7 @@ func (p *logcatParser) search(line string, pattern *regexp.Regexp) LogcatItem {
 	item := LogcatItem{}
 	for i, key := range pattern.SubexpNames() {
 		if i != 0 {
-			item[key] = mahonia.NewDecoder(*p.encode).ConvertString(match[i])
+			item[key] = match[i]
 		}
 	}
 	return item

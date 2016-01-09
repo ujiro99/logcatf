@@ -48,7 +48,7 @@ var (
 )
 
 func TestFindFormat(t *testing.T) {
-	parser := logcatParser{encode: &UTF8}
+	parser := logcatParser{}
 	for expect, log := range logPatterns {
 		finded := parser.findFormat(log)
 		if expect != finded {
@@ -67,12 +67,11 @@ func TestParse_allFormat(t *testing.T) {
 		}
 		defer fp.Close()
 
-		parser := NewParser(&UTF8)
+		parser := logcatParser{}
 		for line := range lines.Lines(bufio.NewReader(fp)) {
 			// logfile has 2 formats, raw and some else.
 			// "--------- beginning of *" must be used raw format.
 			item := parser.Parse(line)
-			parser := logcatParser{encode: &UTF8}
 			expect := parsedHas[parser.findFormat(line)]
 			for key, hasValue := range expect {
 				if hasValue {
@@ -96,7 +95,7 @@ func TestParse_removeTailSpace(t *testing.T) {
 		"message":  "  test Message",
 	}
 
-	parser := NewParser(&UTF8)
+	parser := logcatParser{}
 	for format, log := range logPatternsHasSpace {
 		item := parser.Parse(log)
 		for key, expect := range expects {
@@ -112,7 +111,7 @@ func TestParse_hasTabInMessage(t *testing.T) {
 		"message": "	test Message",
 	}
 
-	parser := NewParser(&UTF8)
+	parser := logcatParser{}
 	for format, log := range logPatternsHasTab {
 		item := parser.Parse(log)
 		for key, expect := range expects {
@@ -124,21 +123,21 @@ func TestParse_hasTabInMessage(t *testing.T) {
 }
 
 func BenchmarkParse(b *testing.B) {
-	parser := NewParser(&UTF8)
+	parser := logcatParser{}
 	for i := 0; i < b.N; i++ {
 		parser.Parse(logPatterns["threadtime"])
 	}
 }
 
 func BenchmarkFindFormat(b *testing.B) {
-	parser := logcatParser{encode: &UTF8}
+	parser := logcatParser{}
 	for i := 0; i < b.N; i++ {
 		parser.findFormat(logPatterns["threadtime"])
 	}
 }
 
 func BenchmarkSearch(b *testing.B) {
-	parser := logcatParser{encode: &UTF8}
+	parser := logcatParser{}
 	for i := 0; i < b.N; i++ {
 		parser.search(logPatterns["threadtime"], patterns["threadtime"])
 	}
