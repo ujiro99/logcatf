@@ -120,7 +120,7 @@ func (cli *CLI) initParameter(args []string) *CLIParameter {
 		trigger = app.Flag("on", Message["helpTrigger"]).Short('o').String()
 		command = app.Flag("command", Message["helpCommand"]).Short('c').String()
 		encode  = app.Flag("encode", Message["helpEncode"]).String()
-		toCsv   = app.Flag("toCsv", Message["helpToCsv"]).Bool()
+		toCsv   = app.Flag("to-csv", Message["helpToCsv"]).Bool()
 	)
 	app.HelpFlag.Short('h')
 	app.Version(Version)
