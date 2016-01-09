@@ -25,21 +25,23 @@ var (
 // Formatter of logcatItem
 type Formatter interface {
 	// Format create a formatted string.
-	Format(format string, item *LogcatItem) string
+	Format(item *LogcatItem) string
 	// Verify checks a format
-	Verify(format string) error
+	Verify() error
 	// Normarize convert long keys to short keys.
-	Normarize(format string) string
+	Normarize()
 }
 
 // implements Formatter
-type defaultFormatter struct{}
+type defaultFormatter struct {
+	format *string
+}
 
 // Format implements Formatter
 // replace %* keywords to real value. use short format.
 //   ex) "%t %a" => "12-28 19:01:14.073 GLSUser"
-func (f *defaultFormatter) Format(format string, item *LogcatItem) string {
-	matches := sformatRegex.FindAllStringSubmatch(format, len(formatMap))
+func (f *defaultFormatter) Format(item *LogcatItem) string {
+	matches := sformatRegex.FindAllStringSubmatch(*f.format, len(formatMap))
 	formatArgs := make([]interface{}, 0, len(matches))
 	// find matched keyword and store value on item
 	for _, match := range matches {
@@ -51,21 +53,21 @@ func (f *defaultFormatter) Format(format string, item *LogcatItem) string {
 			}
 		}
 	}
-	format = sformatRegex.ReplaceAllStringFunc(format, func(str string) string {
+	format := sformatRegex.ReplaceAllStringFunc(*f.format, func(str string) string {
 		return flagRegex.ReplaceAllString(str, "s")
 	})
 	return fmt.Sprintf(format, formatArgs...)
 }
 
 // Verify implements Formatter
-func (f *defaultFormatter) Verify(format string) error {
+func (f *defaultFormatter) Verify() error {
 	err := ParameterError{}
 	var msg []string
-	msg = f.verifyUnabailavleKeyword(format)
+	msg = f.verifyUnabailavleKeyword(*f.format)
 	if msg != nil {
 		err.errors = append(err.errors, msg...)
 	}
-	msg = f.verifyDuplicatedKeyword(format)
+	msg = f.verifyDuplicatedKeyword(*f.format)
 	if msg != nil {
 		err.errors = append(err.errors, msg...)
 	}
@@ -133,18 +135,19 @@ func (e *ParameterError) Error() string {
 }
 
 // Normarize implements Formatter
-func (f *defaultFormatter) Normarize(format string) string {
+func (f *defaultFormatter) Normarize() {
+	newFormat := *f.format
 	for long, short := range formatMap {
-		format = strings.Replace(format, long, short, flagAll)
+		newFormat = strings.Replace(newFormat, long, short, flagAll)
 	}
-	return f.replaceEscape(format)
+	res := f.replaceEscape(newFormat)
+	f.format = &res
 }
 
 func (f *defaultFormatter) replaceEscape(format string) string {
-	result := format
-	result = strings.Replace(result, "\\t", "\t", flagAll)
-	result = strings.Replace(result, "\\n", "\n", flagAll)
-	return result
+	format = strings.Replace(format, "\\t", "\t", flagAll)
+	format = strings.Replace(format, "\\n", "\n", flagAll)
+	return format
 }
 
 // TODO find out generic api for find key.

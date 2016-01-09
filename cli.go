@@ -25,11 +25,6 @@ type CLI struct {
 	executor             Executor
 }
 
-// CLIParameter represents parameters to execute command.
-type CLIParameter struct {
-	format *string
-}
-
 var (
 	formatter Formatter
 	parser    Parser
@@ -39,8 +34,8 @@ var (
 // Run invokes the CLI with the given arguments.
 func (cli *CLI) Run(args []string) int {
 
-	param := cli.initParameter(args)
-	err := cli.verifyParameter(param)
+	cli.initialize(args)
+	err := cli.verifyParameter()
 	if err != nil {
 		fmt.Fprintln(cli.errStream, err.Error())
 		log.Debug(err.Error())
@@ -49,7 +44,7 @@ func (cli *CLI) Run(args []string) int {
 
 	// let's start
 	for line := range lines.Lines(cli.inStream) {
-		item := cli.parseLine(param, line)
+		item := cli.parseLine(line)
 		cli.executor.IfMatch(&line).Exec(&item)
 	}
 
@@ -58,17 +53,17 @@ func (cli *CLI) Run(args []string) int {
 }
 
 // exec parse and format
-func (cli *CLI) parseLine(param *CLIParameter, line string) LogcatItem {
+func (cli *CLI) parseLine(line string) LogcatItem {
 	item := parser.Parse(line)
 	if item == nil {
 		return nil
 	}
-	output := formatter.Format(*param.format, &item)
+	output := formatter.Format(&item)
 	fmt.Fprintln(writer, output)
 	return item
 }
 
-func (cli *CLI) initParameter(args []string) *CLIParameter {
+func (cli *CLI) initialize(args []string) {
 	// setup kingpin & parse args
 	var (
 		app     = kingpin.New(Name, Message["commandDescription"])
@@ -93,29 +88,28 @@ func (cli *CLI) initParameter(args []string) *CLIParameter {
 		}
 	}
 
+	// initialize formatter
 	if *toCsv {
-		formatter = &csvFormatter{}
+		formatter = &csvFormatter{format: format}
 	} else {
-		formatter = &defaultFormatter{}
+		formatter = &defaultFormatter{format: format}
 	}
+	// convert format (long => short)
+	formatter.Normarize()
 
+	// initialize writer
 	if *encode == "shift-jis" {
 		writer = transform.NewWriter(cli.outStream, japanese.ShiftJIS.NewEncoder())
 	} else {
 		writer = cli.outStream
 	}
 
-	// convert format (long => short)
-	normarized := formatter.Normarize(*format)
-	format = &normarized
+	// initialize parser
 	parser = &logcatParser{}
 
 	log.WithFields(log.Fields{"format": *format, "trigger": *trigger, "command": *command}).Debug("Parameter initialized.")
-	return &CLIParameter{
-		format: format,
-	}
 }
 
-func (cli *CLI) verifyParameter(param *CLIParameter) error {
-	return formatter.Verify(*param.format)
+func (cli *CLI) verifyParameter() error {
+	return formatter.Verify()
 }

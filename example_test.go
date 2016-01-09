@@ -10,7 +10,9 @@ func ExampleLogcatItem_Format_time_message() {
 		"time":    "12-28 19:01:14.073",
 		"message": "at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)",
 	}
-	fmt.Println(formatter.Format("%t, %m", item))
+	format := "%t, %m"
+	formatter = &defaultFormatter{format: &format}
+	fmt.Println(formatter.Format(item))
 	// Output:
 	// 12-28 19:01:14.073, at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)
 }
@@ -22,7 +24,9 @@ func ExampleLogcatItem_Format_escapedCharactor() {
 		"priority": "W",
 		"message":  "at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)",
 	}
-	fmt.Println(formatter.Format("%t\t%a\t%p\n%m", item))
+	format := "%t\t%a\t%p\n%m"
+	formatter = &defaultFormatter{format: &format}
+	fmt.Println(formatter.Format(item))
 	// Output:
 	// 12-28 19:01:14.073	GLSUser	W
 	// at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)
@@ -33,7 +37,9 @@ func ExampleLogcatItem_Format_priority_missing() {
 		"time":    "12-28 19:01:14.073",
 		"message": "at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)",
 	}
-	fmt.Println(formatter.Format("%p, %t, %m", item))
+	format := "%p, %t, %m"
+	formatter = &defaultFormatter{format: &format}
+	fmt.Println(formatter.Format(item))
 	// Output:
 	// , 12-28 19:01:14.073, at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)
 }
@@ -47,7 +53,9 @@ func ExampleLogcatItem_Format_all() {
 		"tag":      "GLSUser",
 		"message":  "at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)",
 	}
-	fmt.Println(formatter.Format("%t, %a, %i, %I, %p, %m", item))
+	format := "%t, %a, %i, %I, %p, %m"
+	formatter = &defaultFormatter{format: &format}
+	fmt.Println(formatter.Format(item))
 	// Output:
 	// 12-28 19:01:14.073, GLSUser, 1836, 2720, W, at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)
 }
@@ -60,7 +68,9 @@ func ExampleLogcatItem_Format_remainFrags() {
 		"priority": "W",
 		"tag":      "Tag",
 	}
-	fmt.Println(formatter.Format("%t, %8a, %4i, %-4I,%2p", item))
+	format := "%t, %8a, %4i, %-4I,%2p"
+	formatter = &defaultFormatter{format: &format}
+	fmt.Println(formatter.Format(item))
 	// Output:
 	// 12-28 19:01:14.073,      Tag,    1, 2   , W
 }
@@ -73,8 +83,9 @@ func ExampleLogcatItem_Format_toCsv() {
 
 	cli := newCli()
 	cli.outStream = os.Stdout
-	f := csvFormatter{}
-	fmt.Println(f.Format("%m %i", item))
+	format := "%m %i"
+	f := csvFormatter{format: &format}
+	fmt.Println(f.Format(item))
 	// Output:
 	// "aaa""bbb""ccc",1
 }
