@@ -3,6 +3,7 @@ sudo: false
 go:
   - tip
 before_install:
+  - go get github.com/mattn/go-isatty
   - go get github.com/mitchellh/gox
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
