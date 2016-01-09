@@ -3,10 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
-	"os/exec"
 	"regexp"
-	"runtime"
 
 	"github.com/Maki-Daisuke/go-lines"
 	log "github.com/Sirupsen/logrus"
@@ -21,23 +18,16 @@ const (
 	ExitCodeError int = 1 + iota
 )
 
-// EventFunc watches logcat line.
-// if line contains param.trigger, exec param.command.
-type EventFunc func(param *CLIParameter, line *string, item *LogcatItem)
-
 // CLI is the command line object
 type CLI struct {
 	inStream             io.Reader
 	outStream, errStream io.Writer
-	eventFunc            EventFunc
-	eventTrigger         *regexp.Regexp
+	executor             Executor
 }
 
 // CLIParameter represents parameters to execute command.
 type CLIParameter struct {
-	format,
-	trigger,
-	command *string
+	format *string
 }
 
 var (
@@ -45,9 +35,6 @@ var (
 	parser    Parser
 	writer    io.Writer
 )
-
-func init() {
-}
 
 // Run invokes the CLI with the given arguments.
 func (cli *CLI) Run(args []string) int {
@@ -63,7 +50,7 @@ func (cli *CLI) Run(args []string) int {
 	// let's start
 	for line := range lines.Lines(cli.inStream) {
 		item := cli.parseLine(param, line)
-		cli.eventFunc(param, &line, &item)
+		cli.executor.IfMatch(&line).Exec(&item)
 	}
 
 	log.Debugf("run finished")
@@ -79,37 +66,6 @@ func (cli *CLI) parseLine(param *CLIParameter, line string) LogcatItem {
 	output := formatter.Format(*param.format, &item)
 	fmt.Fprintln(writer, output)
 	return item
-}
-
-// dont execute command.
-func (cli *CLI) execCommandNot(param *CLIParameter, line *string, item *LogcatItem) {
-}
-
-// execute command if
-func (cli *CLI) execCommand(param *CLIParameter, line *string, item *LogcatItem) {
-	if !cli.eventTrigger.MatchString(*line) {
-		return
-	}
-	log.Debugf("--command start: \"%s\" on \"%s\"", *param.command, *line)
-
-	for k := range formatMap {
-		os.Setenv(k, (*item)[k])
-	}
-
-	var cmd *exec.Cmd
-	if runtime.GOOS == "windows" {
-		cmd = exec.Command(os.Getenv("COMSPEC"), "/c", *param.command)
-	} else {
-		cmd = exec.Command(os.Getenv("SHELL"), "-c", *param.command)
-	}
-	cmd.Stdout = cli.errStream
-	err := cmd.Start()
-	if err != nil {
-		log.Error(err)
-	}
-	// cmd.Wait()
-
-	log.Debugf("--command finish: \"%s\"", *param.command)
 }
 
 func (cli *CLI) initParameter(args []string) *CLIParameter {
@@ -128,10 +84,13 @@ func (cli *CLI) initParameter(args []string) *CLIParameter {
 
 	// if trigger not exists, not execute anything.
 	if *trigger == "" {
-		cli.eventFunc = cli.execCommandNot
+		cli.executor = &emptyExecutor{}
 	} else {
-		cli.eventFunc = cli.execCommand
-		cli.eventTrigger = regexp.MustCompile(*trigger)
+		cli.executor = &executor{
+			trigger: regexp.MustCompile(*trigger),
+			command: command,
+			Stdout:  cli.errStream,
+		}
 	}
 
 	if *toCsv {
@@ -153,9 +112,7 @@ func (cli *CLI) initParameter(args []string) *CLIParameter {
 
 	log.WithFields(log.Fields{"format": *format, "trigger": *trigger, "command": *command}).Debug("Parameter initialized.")
 	return &CLIParameter{
-		format:  format,
-		trigger: trigger,
-		command: command,
+		format: format,
 	}
 }
 

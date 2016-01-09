@@ -137,7 +137,7 @@ func TestRun_execCommand(t *testing.T) {
 		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
 	}
 
-	<-time.After(time.Second / 10)
+	<-time.After(time.Second / 100)
 	expect := "test"
 	str := out.String()
 	if !strings.Contains(str, expect) {
