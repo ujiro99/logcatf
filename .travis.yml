@@ -7,10 +7,31 @@ before_install:
   - go get github.com/mitchellh/gox
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
-  - go get github.com/tcnksm/ghr
   - if ! go get github.com/golang/tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
 script:
   - $HOME/gopath/bin/goveralls -service=travis-ci
 after_success:
   - gox -output "dist/{{.OS}}_{{.Arch}}_{{.Dir}}"
-  - ghr --username ujiro99 --token $GITHUB_TOKEN --replace --prerelease pre-release dist/
+deploy:
+  provider: releases
+  api-key: $GITHUB_TOKEN
+  skip_cleanup: true
+  file:
+    - "dist/darwin_386_logcatf"
+    - "dist/darwin_amd64_logcatf"
+    - "dist/freebsd_386_logcatf"
+    - "dist/freebsd_amd64_logcatf"
+    - "dist/freebsd_arm_logcatf"
+    - "dist/linux_386_logcatf"
+    - "dist/linux_amd64_logcatf"
+    - "dist/linux_arm_logcatf"
+    - "dist/netbsd_386_logcatf"
+    - "dist/netbsd_amd64_logcatf"
+    - "dist/netbsd_arm_logcatf"
+    - "dist/openbsd_386_logcatf"
+    - "dist/openbsd_amd64_logcatf"
+    - "dist/windows_386_logcatf.exe"
+    - "dist/windows_amd64_logcatf.exe"
+  on:
+    all_branches: true
+    tags: true
