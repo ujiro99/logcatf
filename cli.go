@@ -107,7 +107,7 @@ func (cli *CLI) initialize(args []string) error {
 	formatter.Normarize()
 
 	// initialize writer
-	if *encode == "shift-jis" {
+	if *encode == ShiftJIS {
 		writer = transform.NewWriter(cli.outStream, japanese.ShiftJIS.NewEncoder())
 	} else {
 		writer = cli.outStream

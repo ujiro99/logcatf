@@ -31,7 +31,7 @@ type executor struct {
 
 // check a line. implements Executer.
 func (e *executor) IfMatch(line *string) Executor {
-	if !e.trigger.MatchString(*line) {
+	if line == nil || !e.trigger.MatchString(*line) {
 		return &emptyExecutor{}
 	}
 	log.Debugf("--execute on: \"%s\" ", e.trigger.String())
@@ -42,8 +42,10 @@ func (e *executor) IfMatch(line *string) Executor {
 func (e *executor) Exec(item *LogcatItem) {
 	log.Debugf("--command start: \"%s\"", *e.command)
 
-	for _, k := range item.Keys() {
-		os.Setenv(k, (*item)[k])
+	if item != nil {
+		for _, k := range item.Keys() {
+			os.Setenv(k, (*item)[k])
+		}
 	}
 
 	var cmd *exec.Cmd

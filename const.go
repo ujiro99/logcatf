@@ -4,9 +4,13 @@ const (
 	// Name of this command.
 	Name string = "logcatf"
 	// Version of this command.
-	Version string = "0.1.0"
+	Version string = "0.3.0"
 	// DefaultFormat will be used if format wasn't specified.
 	DefaultFormat string = "%time %tag %priority %message"
+	// UTF8 represents encode `utf-8`
+	UTF8 = "utf-8"
+	// ShiftJIS represents encode `shift-jis`
+	ShiftJIS = "shift-jis"
 )
 
 // Message has message strings.
@@ -30,8 +34,3 @@ var Message = map[string]string{
 	"msgDuplicatedKeyword":  "error: %s or %s is duplicated.",
 	"msgCommandNumMismatch": "error: number of on and command flags are mismatch.",
 }
-
-var (
-	// UTF8 represents encode `utf-8`
-	UTF8 = "utf-8"
-)
