@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"regexp"
 
 	"github.com/Maki-Daisuke/go-lines"
 	log "github.com/Sirupsen/logrus"
@@ -68,7 +67,7 @@ func (cli *CLI) initialize(args []string) {
 	var (
 		app     = kingpin.New(Name, Message["commandDescription"])
 		format  = app.Arg("format", Message["helpFormat"]).Default(DefaultFormat).String()
-		trigger = app.Flag("on", Message["helpTrigger"]).Short('o').String()
+		trigger = app.Flag("on", Message["helpTrigger"]).Short('o').Regexp()
 		command = app.Flag("command", Message["helpCommand"]).Short('c').String()
 		encode  = app.Flag("encode", Message["helpEncode"]).String()
 		toCsv   = app.Flag("to-csv", Message["helpToCsv"]).Bool()
@@ -78,11 +77,11 @@ func (cli *CLI) initialize(args []string) {
 	kingpin.MustParse(app.Parse(args[1:]))
 
 	// if trigger not exists, not execute anything.
-	if *trigger == "" {
+	if *trigger == nil {
 		cli.executor = &emptyExecutor{}
 	} else {
 		cli.executor = &executor{
-			trigger: regexp.MustCompile(*trigger),
+			trigger: *trigger,
 			command: command,
 			Stdout:  cli.errStream,
 		}
