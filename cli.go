@@ -76,8 +76,9 @@ func (cli *CLI) initialize(args []string) {
 	app.Version(Version)
 	kingpin.MustParse(app.Parse(args[1:]))
 
-	// if trigger not exists, not execute anything.
+	// initialize executor
 	if *trigger == nil {
+		// if trigger not exists, not execute anything.
 		cli.executor = &emptyExecutor{}
 	} else {
 		cli.executor = &executor{
