@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
+	"strings"
 )
 
 // implements Formatter
@@ -31,5 +32,5 @@ func (f *csvFormatter) Format(item *LogcatItem) string {
 	writer := csv.NewWriter(buf)
 	writer.Write(args)
 	writer.Flush()
-	return buf.String()
+	return strings.TrimRight(buf.String(), "\r\n")
 }
