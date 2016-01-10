@@ -45,7 +45,7 @@ func TestRun_formatDefault(t *testing.T) {
 
 func TestRun_formatEscapedCharactor(t *testing.T) {
 	cli := newCli()
-	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   930 I auditd  : type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295")
+	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   930 I my_app  : message")
 	out := new(bytes.Buffer)
 	cli.outStream = out
 
@@ -56,7 +56,7 @@ func TestRun_formatEscapedCharactor(t *testing.T) {
 		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
 	}
 
-	expect := "12-28 18:54:07.180\tauditd\tI\ntype=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295\n"
+	expect := "12-28 18:54:07.180\tmy_app\tI\nmessage\n"
 	str := out.String()
 	if str != expect {
 		t.Errorf("expected \"%s\" to eq \"%s\"", str, expect)
@@ -107,7 +107,7 @@ func TestRun_formatError_DuplicatedKeyword(t *testing.T) {
 
 func TestRun_formatShort(t *testing.T) {
 	cli := newCli()
-	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I auditd  : type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295")
+	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : message")
 	out := new(bytes.Buffer)
 	cli.outStream = out
 
@@ -118,7 +118,7 @@ func TestRun_formatShort(t *testing.T) {
 		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
 	}
 
-	expect := "12-28 18:54:07.180 930 931 I auditd: type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295\n"
+	expect := "12-28 18:54:07.180 930 931 I my_app: message\n"
 	str := out.String()
 	if str != expect {
 		t.Errorf("expected \"%s\" to eq \"%s\"", str, expect)
@@ -127,7 +127,7 @@ func TestRun_formatShort(t *testing.T) {
 
 func TestRun_toCsv(t *testing.T) {
 	cli := newCli()
-	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I auditd  : hello, world.")
+	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : hello, world.")
 	out := new(bytes.Buffer)
 	cli.outStream = out
 
@@ -147,11 +147,11 @@ func TestRun_toCsv(t *testing.T) {
 
 func TestRun_execCommand(t *testing.T) {
 	cli := newCli()
-	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I auditd  : type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295")
+	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : message")
 	out := new(bytes.Buffer)
 	cli.errStream = out
 
-	args := []string{"./logcatf", "%t %i %I %p %a: %m", "-o", "policy loaded", "-c", "echo test"}
+	args := []string{"./logcatf", "%t %i %I %p %a: %m", "-o", "my_app.*message", "-c", "echo test"}
 	status := cli.Run(args)
 	if status != ExitCodeOK {
 		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
@@ -186,11 +186,11 @@ func TestRun_execCommand_async(t *testing.T) {
 
 func TestRun_execCommand_outputParsed(t *testing.T) {
 	cli := newCli()
-	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I auditd  : type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295")
+	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : message")
 	err := new(bytes.Buffer)
 	cli.errStream = err
 
-	args := []string{"./logcatf", "-o", "policy loaded", "-c", "echo parsed: $time"}
+	args := []string{"./logcatf", "-o", "my_app.*message", "-c", "echo parsed: $time"}
 	status := cli.Run(args)
 	if status != ExitCodeOK {
 		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
