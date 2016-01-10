@@ -34,7 +34,7 @@ func (e *executor) IfMatch(line *string) Executor {
 	if !e.trigger.MatchString(*line) {
 		return &emptyExecutor{}
 	}
-	log.Debugf("--execute on: \"%s\" ", *e.trigger)
+	log.Debugf("--execute on: \"%s\" ", e.trigger.String())
 	return e
 }
 

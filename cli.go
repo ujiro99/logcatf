@@ -21,7 +21,7 @@ const (
 type CLI struct {
 	inStream             io.Reader
 	outStream, errStream io.Writer
-	executor             Executor
+	executors            []Executor
 }
 
 var (
@@ -33,8 +33,8 @@ var (
 // Run invokes the CLI with the given arguments.
 func (cli *CLI) Run(args []string) int {
 
-	cli.initialize(args)
-	err := cli.verifyFormat()
+	// initialize
+	err := cli.initialize(args)
 	if err != nil {
 		fmt.Fprintln(cli.errStream, err.Error())
 		log.Debug(err.Error())
@@ -44,7 +44,7 @@ func (cli *CLI) Run(args []string) int {
 	// let's start
 	for line := range lines.Lines(cli.inStream) {
 		item := cli.parseLine(line)
-		cli.executor.IfMatch(&line).Exec(&item)
+		cli.execute(&line, &item)
 	}
 
 	log.Debugf("run finished")
@@ -62,30 +62,37 @@ func (cli *CLI) parseLine(line string) LogcatItem {
 	return item
 }
 
-func (cli *CLI) initialize(args []string) {
+func (cli *CLI) initialize(args []string) error {
 	// setup kingpin & parse args
 	var (
-		app     = kingpin.New(Name, Message["commandDescription"])
-		format  = app.Arg("format", Message["helpFormat"]).Default(DefaultFormat).String()
-		trigger = app.Flag("on", Message["helpTrigger"]).Short('o').Regexp()
-		command = app.Flag("command", Message["helpCommand"]).Short('c').String()
-		encode  = app.Flag("encode", Message["helpEncode"]).String()
-		toCsv   = app.Flag("to-csv", Message["helpToCsv"]).Bool()
+		app      = kingpin.New(Name, Message["commandDescription"])
+		format   = app.Arg("format", Message["helpFormat"]).Default(DefaultFormat).String()
+		triggers = app.Flag("on", Message["helpTrigger"]).Short('o').RegexpList()
+		commands = app.Flag("command", Message["helpCommand"]).Short('c').Strings()
+		encode   = app.Flag("encode", Message["helpEncode"]).String()
+		toCsv    = app.Flag("to-csv", Message["helpToCsv"]).Bool()
 	)
 	app.HelpFlag.Short('h')
 	app.Version(Version)
 	kingpin.MustParse(app.Parse(args[1:]))
 
 	// initialize executor
-	if *trigger == nil {
+	if *triggers == nil {
 		// if trigger not exists, not execute anything.
-		cli.executor = &emptyExecutor{}
+		cli.executors = []Executor{&emptyExecutor{}}
 	} else {
-		cli.executor = &executor{
-			trigger: *trigger,
-			command: command,
-			Stdout:  cli.errStream,
+		if len(*triggers) != len(*commands) {
+			return &ParameterError{Message["msgCommandNumMismatch"]}
 		}
+		es := []Executor{}
+		for i, t := range *triggers {
+			es = append(es, &executor{
+				trigger: t,
+				command: &(*commands)[i],
+				Stdout:  cli.errStream,
+			})
+		}
+		cli.executors = es
 	}
 
 	// initialize formatter
@@ -109,9 +116,27 @@ func (cli *CLI) initialize(args []string) {
 	// initialize parser
 	parser = &logcatParser{}
 
-	log.WithFields(log.Fields{"format": *format, "trigger": *trigger, "command": *command}).Debug("Parameter initialized.")
+	log.WithFields(log.Fields{
+		"format":  *format,
+		"trigger": *triggers,
+		"command": *commands}).Debug("Parameter initialized.")
+
+	return formatter.Verify()
 }
 
-func (cli *CLI) verifyFormat() error {
-	return formatter.Verify()
+// execute calls multiple executers.
+func (cli *CLI) execute(line *string, item *LogcatItem) {
+	for _, e := range cli.executors {
+		e.IfMatch(line).Exec(item)
+	}
+}
+
+// ParameterError has error message of parameter.
+type ParameterError struct {
+	msg string
+}
+
+// Error returns all error message.
+func (e *ParameterError) Error() string {
+	return e.msg
 }

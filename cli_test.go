@@ -105,6 +105,28 @@ func TestRun_formatError_DuplicatedKeyword(t *testing.T) {
 	}
 }
 
+func TestRun_parameterError_exec_mismatch(t *testing.T) {
+	err := new(bytes.Buffer)
+	cli := newCli()
+	cli.errStream = err
+
+	args := []string{"./logcatf",
+		"-o", "my_app.*first", "-c", "echo 1st $message",
+		"-o", "my_app.*third",
+	}
+	status := cli.Run(args)
+
+	if status != ExitCodeError {
+		t.Errorf("expected %d to eq %d", status, ExitCodeError)
+	}
+
+	expect := fmt.Sprintf(Message["msgmsgCommandNumMismatch"])
+	str := err.String()
+	if !strings.Contains(str, expect) {
+		t.Errorf("expect: \"%s\"\nresult: \"%s\"", expect, str)
+	}
+}
+
 func TestRun_formatShort(t *testing.T) {
 	cli := newCli()
 	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : message")
@@ -202,7 +224,33 @@ func TestRun_execCommand_outputParsed(t *testing.T) {
 	if !strings.Contains(str, expect) {
 		t.Errorf("$time was not expanded.")
 	}
+}
 
+func TestRun_execCommand_multiple(t *testing.T) {
+	cli := newCli()
+	cli.inStream = strings.NewReader("" +
+		"12-28 18:54:07.180   930   931 I my_app  : first\n" +
+		"12-28 18:54:07.180   930   931 I my_app  : second\n" +
+		"12-28 18:54:07.180   930   931 I my_app  : third\n")
+	//err := new(bytes.Buffer)
+	// TODO couldn't test this.
+	// checked that exec works correctly, using os.Stdout.
+	//cli.errStream = err
+	//cli.errStream = os.Stdout
+	args := []string{"./logcatf",
+		"-o", "my_app.*first", "-c", "echo 1st $message",
+		"-o", "my_app.*third", "-c", "echo 3rd $message",
+	}
+	status := cli.Run(args)
+	if status != ExitCodeOK {
+		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
+	}
+	// <-time.After(time.Second / 10)
+	// expect := "1st first_line\n2nd second_line"
+	// str := err.String()
+	// if !strings.Contains(str, expect) {
+	// 	t.Errorf("\nresult: %s\nexpect: %s", err.String(), expect)
+	// }
 }
 
 func TestRun_encode_shiftjis(t *testing.T) {
