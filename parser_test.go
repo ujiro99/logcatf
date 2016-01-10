@@ -124,6 +124,7 @@ func TestParse_hasTabInMessage(t *testing.T) {
 
 func BenchmarkParse(b *testing.B) {
 	parser := logcatParser{}
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		parser.Parse(logPatterns["threadtime"])
 	}
@@ -131,6 +132,7 @@ func BenchmarkParse(b *testing.B) {
 
 func BenchmarkFindFormat(b *testing.B) {
 	parser := logcatParser{}
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		parser.findFormat(logPatterns["threadtime"])
 	}
@@ -138,6 +140,7 @@ func BenchmarkFindFormat(b *testing.B) {
 
 func BenchmarkSearch(b *testing.B) {
 	parser := logcatParser{}
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		parser.search(logPatterns["threadtime"], patterns["threadtime"])
 	}

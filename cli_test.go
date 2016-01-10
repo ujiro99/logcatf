@@ -285,6 +285,7 @@ func BenchmarkDefault(b *testing.B) {
 	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : message")
 	args := []string{"./logcatf", "%t %i %I %p %a: %m"}
 
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		cli.Run(args)
 	}
@@ -295,6 +296,7 @@ func BenchmarkEncodeShiftJis(b *testing.B) {
 	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : message")
 	args := []string{"./logcatf", "%t %i %I %p %a: %m", "--encode", "shift-jis"}
 
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		cli.Run(args)
 	}
@@ -305,6 +307,7 @@ func BenchmarkToCsv(b *testing.B) {
 	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : message")
 	args := []string{"./logcatf", "%t %i %I %p %a: %m", "--to-csv"}
 
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		cli.Run(args)
 	}
@@ -315,6 +318,7 @@ func BenchmarkExecCommand(b *testing.B) {
 	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : message")
 	args := []string{"./logcatf", "-o", "my_app.*message", "-c", "echo test"}
 
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		cli.Run(args)
 	}
