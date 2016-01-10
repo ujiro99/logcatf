@@ -40,6 +40,8 @@ You can execute a command when a keyword  matched to Logcat.
     -o, --on=ON              regex to trigger a COMMAND.
     -c, --command=COMMAND    COMMAND will be executed on regex matched.
                              In COMMAND, you can use parsed logcat as shell variables.
+        --encode=ENCODE      output character encode. (utf-8 / shift-jis)
+        --to-csv             output to CSV format. double-quote will be escaped.
 
     ex) -o "MY_APP.*Error" -c "echo \${message} > error.log"
 
@@ -51,14 +53,14 @@ Command's stdout is redirected to stderr of logcatf.
 ## Examples
 
 ```bash
-# show only time and message.
+# show time, pid and message.
 $ adb logcat -v time | logcatf "%time %4i %message"
 
 # output to csv format.
-$ adb logcat -v threadtime | logcatf "%t, %a, %p, %i, %I, %m" > logcat.csv
+$ adb logcat -v threadtime | logcatf "%t %a %p %i %I %m" --to-csv > logcat.csv
 
 # get screencap on Exception
-$ adb logcat -v time | logcatf "%t %m" -o "MY_APP.*Error" -c "adb shell screencap -p /sdcard/a.png"
+$ adb logcat -v time | logcatf -o "MY_APP.*Error" -c "adb shell screencap -p /sdcard/a.png"
 ```
 
 
@@ -66,17 +68,17 @@ $ adb logcat -v time | logcatf "%t %m" -o "MY_APP.*Error" -c "adb shell screenca
 
 You can get binary from github release page.
 
-[Release Page](https://github.com/ujiro99/logcatf/releases)
+[-> Release Page](https://github.com/ujiro99/logcatf/releases)
 
 or, use `go get`:
 
 ```bash
-$ go get github.com/Ujiro99/logcatf
+$ go get github.com/ujiro99/logcatf
 ```
 
 ## Contribution
 
-1. Fork ([https://github.com/Ujiro99/logcatf/fork](https://github.com/Ujiro99/logcatf/fork))
+1. Fork ([https://github.com/ujiro99/logcatf/fork](https://github.com/ujiro99/logcatf/fork))
 1. Create a feature branch
 1. Commit your changes
 1. Rebase your local changes against the master branch
