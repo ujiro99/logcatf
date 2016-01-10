@@ -34,7 +34,7 @@ var (
 func (cli *CLI) Run(args []string) int {
 
 	cli.initialize(args)
-	err := cli.verifyParameter()
+	err := cli.verifyFormat()
 	if err != nil {
 		fmt.Fprintln(cli.errStream, err.Error())
 		log.Debug(err.Error())
@@ -112,6 +112,6 @@ func (cli *CLI) initialize(args []string) {
 	log.WithFields(log.Fields{"format": *format, "trigger": *trigger, "command": *command}).Debug("Parameter initialized.")
 }
 
-func (cli *CLI) verifyParameter() error {
+func (cli *CLI) verifyFormat() error {
 	return formatter.Verify()
 }

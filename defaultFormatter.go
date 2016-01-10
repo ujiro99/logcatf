@@ -61,7 +61,7 @@ func (f *defaultFormatter) Format(item *LogcatItem) string {
 
 // Verify implements Formatter
 func (f *defaultFormatter) Verify() error {
-	err := ParameterError{}
+	err := FormatError{}
 	var msg []string
 	msg = f.verifyUnabailavleKeyword(*f.format)
 	if msg != nil {
@@ -121,13 +121,13 @@ func (f *defaultFormatter) verifyDuplicatedKeyword(format string) []string {
 	return msgs
 }
 
-// ParameterError has error message of parameter.
-type ParameterError struct {
+// FormatError has error message of parameter.
+type FormatError struct {
 	errors []string
 }
 
 // Error returns all error message.
-func (e *ParameterError) Error() string {
+func (e *FormatError) Error() string {
 	if e.errors != nil {
 		return strings.Join(e.errors, "\n")
 	}
