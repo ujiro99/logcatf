@@ -18,7 +18,7 @@ var Message = map[string]string{
      %i (%pid), %I (%tid), %m (%message)
  - Example:
    adb logcat -v time | logcatf "%t %4i %m"
-   adb logcat -v threadtime | logcatf "%t, %a, %m" --to-csv > logcat.csv
+   adb logcat -v time | logcatf "%t %a %m" --to-csv > logcat.csv
    adb logcat -v | logcatf -o "Exception" -c "adb shell screencap -p /data/local/tmp/s.png"
  - Default Format:
    "%time %tag %priority %message"`,
@@ -28,6 +28,7 @@ var Message = map[string]string{
 	"helpToCsv":             "output to CSV format. double-quote will be escaped.",
 	"msgUnavailableKeyword": "error: %s is not available. Please check `Availavle Keyword:` on help.",
 	"msgDuplicatedKeyword":  "error: %s or %s is duplicated.",
+	"msgCommandNumMismatch": "error: number of on and command flags are mismatch.",
 }
 
 var (
