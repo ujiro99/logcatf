@@ -84,7 +84,9 @@ func ExampleLogcatItem_Format_toCsv() {
 	cli := newCli()
 	cli.outStream = os.Stdout
 	format := "%m %i"
-	f := csvFormatter{format: &format}
+	f := csvFormatter{
+		&defaultFormatter{format: &format},
+	}
 	fmt.Println(f.Format(item))
 	// Output:
 	// "aaa""bbb""ccc",1

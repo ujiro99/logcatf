@@ -7,8 +7,7 @@ import (
 
 // implements Formatter
 type csvFormatter struct {
-	defaultFormatter
-	format *string
+	*defaultFormatter
 }
 
 // Format implements Formatter

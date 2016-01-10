@@ -90,7 +90,9 @@ func (cli *CLI) initialize(args []string) {
 
 	// initialize formatter
 	if *toCsv {
-		formatter = &csvFormatter{format: format}
+		formatter = &csvFormatter{
+			&defaultFormatter{format: format},
+		}
 	} else {
 		formatter = &defaultFormatter{format: format}
 	}
