@@ -1,6 +1,6 @@
 # Logcatf  [![Build Status](https://travis-ci.org/ujiro99/logcatf.svg?branch=master)](https://travis-ci.org/ujiro99/logcatf)  [![Coverage Status](https://coveralls.io/repos/ujiro99/logcatf/badge.svg?branch=master&service=github)](https://coveralls.io/github/ujiro99/logcatf?branch=master)
 
-A Command line tool to format Android Logcat.
+A Command line tool for format Android Logcat.
 
 
 ## Usage
@@ -35,19 +35,32 @@ Default Format:
 
 ## Other options
 
-You can execute a command when a keyword  matched to Logcat.
+### execute commands
+
+You can execute other commands when a keyword matched to Logcat.
 
     -o, --on=ON              regex to trigger a COMMAND.
     -c, --command=COMMAND    COMMAND will be executed on regex matched.
                              In COMMAND, you can use parsed logcat as shell variables.
-        --encode=ENCODE      output character encode. (utf-8 / shift-jis)
+
+    
+* on Linux, You need to escape a dollar sign.
+
+```
+ex) -o "MY_APP.*Error" -c "echo \${message} > error.log"  # linux, mac
+    -o "MY_APP.*Error" -c "echo %message% > error.log"    # Windows
+```
+
+* Command's stdout is redirected to stderr of logcatf.
+* You can use multiple -o / -c pairs.
+ 
+
+### Output CSV
+
+You can output to CSV format.
+
         --to-csv             output to CSV format. double-quote will be escaped.
-
-    ex) -o "MY_APP.*Error" -c "echo \${message} > error.log"
-
-    ** You need to escape a dollar sign.
-
-Command's stdout is redirected to stderr of logcatf.
+        --encode=ENCODE      output character encode. (utf-8 / shift-jis)
 
 
 ## Examples
@@ -88,5 +101,5 @@ $ go get github.com/ujiro99/logcatf
 
 ## Author
 
-[Ujiro99](https://github.com/Ujiro99)
+[ujiro99](https://github.com/ujiro99)
 
