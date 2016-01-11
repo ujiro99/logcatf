@@ -2,6 +2,7 @@
 
 A Command line tool for format Android Logcat.
 
+![ScreenShot](./screenshot.png?raw=true "Optional Title")
 
 ## Usage
 
@@ -22,16 +23,17 @@ Available Format:
 
 Other Flags:
 
-|  Flag | description |
-|------:|---------------------:|
-|   %a  | left-align           |
-|  %8a  | width 8, right-align |
-| %-8a  | width 8, left-align  |
+|  Flag | description              |
+|------:|-------------------------:|
+|   %a  | left-align               |
+|  %8a  | min-width 8, right-align |
+| %-8a  | min-width 8, left-align  |
+| %8.8a | width 8, left-align      |
 
 
 Default Format:
 
-    "%time %tag %priority %message"
+    "%t %p %a: %m"
 
 ## Other options
 
@@ -57,10 +59,56 @@ ex) -o "MY_APP.*Error" -c "echo \${message} > error.log"  # linux, mac
 
 ### Output CSV
 
-You can output to CSV format.
+output to CSV format.
 
         --to-csv             output to CSV format. double-quote will be escaped.
-        --encode=ENCODE      output character encode. (utf-8 / shift-jis)
+        --encode=ENCODE      output character encode. { utf-8 | shift-jis }
+
+### Color
+
+specify output Color.
+
+```
+    --color            enable ANSI color. ( defalult = false )
+    --color-v=COLOR    - color for verbose.
+    --color-d=COLOR    - color for debug.
+    --color-i=COLOR    - color for information.
+    --color-w=COLOR    - color for warning.
+    --color-e=COLOR    - color for error.
+    --color-f=COLOR    - color for fatal.
+```
+
+This function uses [mitchellh/colorstring](https://github.com/mitchellh/colorstring).
+
+In format string, you can use color tags. 
+
+    ex) logcatf "%t [invert] %a [reset] [_white_] %m" --color --color-i "cyan"
+
+Available Color Tags:
+
+|Foreground|             |Background |                  |
+|:--------|:-------------|:----------|:-----------------|
+|black    | dark_gray    |\_black\_  | \_dark_gray\_    |
+|red      | light_red    |\_red\_    | \_light_red\_    |
+|green    | light_green  |\_green\_  | \_light_green\_  |
+|yellow   | light_yellow |\_yellow\_ | \_light_yellow\_ |
+|blue     | light_blue   |\_blue\_   | \_light_blue\_   |
+|magenta  | light_magenta|\_magenta\_| \_light_magenta\_|
+|cyan     | light_cyan   |\_cyan\_   | \_light_cyan\_   |
+|white    | light_gray   |\_white\_  | \_light_gray\_   |
+|default  |              |\_default\_|                  |
+
+|Attributes|           |
+:----------|:----------|
+|bold      |blink_slow |
+|dim       |blink_fast |
+|underline |invert     |
+
+| Reset      |
+|:-----------|
+| reset      |
+| reset_bold |
+
 
 
 ## Examples
