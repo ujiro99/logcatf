@@ -4,7 +4,7 @@ const (
 	// Name of this command.
 	Name string = "logcatf"
 	// Version of this command.
-	Version string = "0.4.0"
+	Version string = "0.4.1"
 	// DefaultFormat will be used if format wasn't specified.
 	DefaultFormat string = "%time [invert] %priority [reset] %tag: %message"
 	// UTF8 represents encode `utf-8`
