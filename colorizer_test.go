@@ -11,7 +11,7 @@ func TestRun_ReplaceColorCode(t *testing.T) {
 	before := "%t [blue] %m"
 	expect := "%t [logcatf_blue] %m"
 
-	f := Fmtc{}
+	f := Colorizer{}
 	after := f.ReplaceColorCode(before)
 
 	if after != expect {
@@ -31,7 +31,7 @@ func TestRun_Fprintln_enable(t *testing.T) {
 	}
 	w := new(bytes.Buffer)
 
-	f := Fmtc{}
+	f := Colorizer{}
 	cc := ColorConfig{}
 	f.SetUp(true, cc)
 	format = f.ReplaceColorCode(format)
@@ -56,7 +56,7 @@ func TestRun_Fprintln_disable(t *testing.T) {
 	}
 	w := new(bytes.Buffer)
 
-	f := Fmtc{}
+	f := Colorizer{}
 	f.SetUp(false, nil)
 	format = f.ReplaceColorCode(format)
 	f.Fprintln(w, format, item)

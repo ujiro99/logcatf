@@ -28,7 +28,7 @@ var (
 	formatter Formatter
 	parser    Parser
 	writer    io.Writer
-	fmtc      Fmtc
+	fmtc      Colorizer
 )
 
 // Run invokes the CLI with the given arguments.
@@ -114,7 +114,7 @@ func (cli *CLI) initialize(args []string) error {
 		"E": *colorE,
 		"F": *colorF,
 	}
-	fmtc = Fmtc{}
+	fmtc = Colorizer{}
 	fmtc.SetUp(*color, config)
 	newFormat := fmtc.ReplaceColorCode(*format)
 
