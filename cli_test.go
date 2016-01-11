@@ -323,3 +323,14 @@ func BenchmarkExecCommand(b *testing.B) {
 		cli.Run(args)
 	}
 }
+
+func BenchmarkCollor(b *testing.B) {
+	cli := newCli()
+	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : message")
+	args := []string{"./logcatf", "--color"}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		cli.Run(args)
+	}
+}
