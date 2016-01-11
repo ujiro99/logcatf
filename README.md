@@ -4,7 +4,20 @@ A Command line tool for format Android Logcat.
 
 ![ScreenShot](./screenshot.png?raw=true "Optional Title")
 
-## Usage
+## Examples
+
+```bash
+# show time, pid and message formatted.
+$ adb logcat -v time | logcatf "%time %4i %message"
+
+# output to csv format.
+$ adb logcat -v threadtime | logcatf "%t %a %p %i %I %m" --to-csv > logcat.csv
+
+# get screencap on Exception
+$ adb logcat -v time | logcatf -o "MY_APP.*Error" -c "adb shell screencap -p /sdcard/a.png"
+```
+
+## Basic Usage
 
 ```bash
 $ adb logcat -v time | logcatf "%t, %m"
@@ -35,7 +48,7 @@ Default Format:
 
     "%t %p %a: %m"
 
-## Other options
+## Options
 
 ### execute commands
 
@@ -78,11 +91,12 @@ specify output Color.
     --color-f=COLOR    - color for fatal.
 ```
 
-This function uses [mitchellh/colorstring](https://github.com/mitchellh/colorstring).
+* This function uses [mitchellh/colorstring](https://github.com/mitchellh/colorstring).
+* In format string, you can use color tags. 
 
-In format string, you can use color tags. 
-
-    ex) logcatf "%t [invert] %a [reset] [_white_] %m" --color --color-i "cyan"
+```
+ex) $ adb logcat | logcatf "%t [invert] %a [reset] [_white_] %m" --color --color-i "cyan"
+```
 
 Available Color Tags:
 
@@ -108,21 +122,6 @@ Available Color Tags:
 |:-----------|
 | reset      |
 | reset_bold |
-
-
-
-## Examples
-
-```bash
-# show time, pid and message.
-$ adb logcat -v time | logcatf "%time %4i %message"
-
-# output to csv format.
-$ adb logcat -v threadtime | logcatf "%t %a %p %i %I %m" --to-csv > logcat.csv
-
-# get screencap on Exception
-$ adb logcat -v time | logcatf -o "MY_APP.*Error" -c "adb shell screencap -p /sdcard/a.png"
-```
 
 
 ## Install
