@@ -28,6 +28,7 @@ var (
 	formatter Formatter
 	parser    Parser
 	writer    io.Writer
+	fmtc      Fmtc
 )
 
 // Run invokes the CLI with the given arguments.
@@ -57,8 +58,9 @@ func (cli *CLI) parseLine(line string) LogcatItem {
 	if item == nil {
 		return nil
 	}
+
 	output := formatter.Format(&item)
-	fmt.Fprintln(writer, output)
+	fmtc.Fprintln(writer, output, item)
 	return item
 }
 
@@ -71,6 +73,7 @@ func (cli *CLI) initialize(args []string) error {
 		commands = app.Flag("command", Message["helpCommand"]).Short('c').Strings()
 		encode   = app.Flag("encode", Message["helpEncode"]).String()
 		toCsv    = app.Flag("to-csv", Message["helpToCsv"]).Bool()
+		color    = app.Flag("color", Message["helpToColor"]).Bool()
 	)
 	app.HelpFlag.Short('h')
 	app.Version(Version)
@@ -95,13 +98,18 @@ func (cli *CLI) initialize(args []string) error {
 		cli.executors = es
 	}
 
+	// initialize colorizer
+	fmtc = Fmtc{}
+	fmtc.SetUp(*color)
+	newFormat := fmtc.ReplaceColorCode(*format)
+
 	// initialize formatter
 	if *toCsv {
 		formatter = &csvFormatter{
-			&defaultFormatter{format: format},
+			&defaultFormatter{format: &newFormat},
 		}
 	} else {
-		formatter = &defaultFormatter{format: format}
+		formatter = &defaultFormatter{format: &newFormat}
 	}
 	// convert format (long => short)
 	formatter.Normarize()

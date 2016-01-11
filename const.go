@@ -6,7 +6,7 @@ const (
 	// Version of this command.
 	Version string = "0.3.0"
 	// DefaultFormat will be used if format wasn't specified.
-	DefaultFormat string = "%time %tag %priority %message"
+	DefaultFormat string = "%time [invert] %priority [reset] %tag: %message"
 	// UTF8 represents encode `utf-8`
 	UTF8 = "utf-8"
 	// ShiftJIS represents encode `shift-jis`
@@ -30,6 +30,7 @@ var Message = map[string]string{
 	"helpCommand":           "COMMAND will be executed on regex mathed. In COMMAND, you can use parsed logcat as shell variables. ex) `\\${message}` You need to escape a dollar mark.",
 	"helpEncode":            "output character encode.",
 	"helpToCsv":             "output to CSV format. double-quote will be escaped.",
+	"helpToColor":           "enable ANSI color.",
 	"msgUnavailableKeyword": "error: %s is not available. Please check `Availavle Keyword:` on help.",
 	"msgDuplicatedKeyword":  "error: %s or %s is duplicated.",
 	"msgCommandNumMismatch": "error: number of on and command flags are mismatch.",
