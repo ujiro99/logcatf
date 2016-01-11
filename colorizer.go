@@ -11,7 +11,7 @@ import (
 const (
 	defaultColorsKey   = 0
 	defaultColorsValue = 1
-	prefix             = "logcatf_"
+	prefix             = "LOGCATF_"
 )
 
 var defaultColors = [][]string{
@@ -79,7 +79,7 @@ var priorityColors = map[string]string{
 	"F": "red",
 }
 
-// Fmtc enables to print strings colored.
+// Colorizer enables to print strings colored.
 type Colorizer struct {
 	context colorstring.Colorize
 }
