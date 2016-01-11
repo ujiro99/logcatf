@@ -74,6 +74,13 @@ func (cli *CLI) initialize(args []string) error {
 		encode   = app.Flag("encode", Message["helpEncode"]).String()
 		toCsv    = app.Flag("to-csv", Message["helpToCsv"]).Bool()
 		color    = app.Flag("color", Message["helpToColor"]).Bool()
+
+		colorV = app.Flag("color-v", Message["helpToColor"]).String()
+		colorD = app.Flag("color-d", Message["helpToColor"]).String()
+		colorI = app.Flag("color-i", Message["helpToColor"]).String()
+		colorW = app.Flag("color-w", Message["helpToColor"]).String()
+		colorE = app.Flag("color-e", Message["helpToColor"]).String()
+		colorF = app.Flag("color-f", Message["helpToColor"]).String()
 	)
 	app.HelpFlag.Short('h')
 	app.Version(Version)
@@ -99,8 +106,16 @@ func (cli *CLI) initialize(args []string) error {
 	}
 
 	// initialize colorizer
+	config := ColorConfig{
+		"V": *colorV,
+		"D": *colorD,
+		"I": *colorI,
+		"W": *colorW,
+		"E": *colorE,
+		"F": *colorF,
+	}
 	fmtc = Fmtc{}
-	fmtc.SetUp(*color)
+	fmtc.SetUp(*color, config)
 	newFormat := fmtc.ReplaceColorCode(*format)
 
 	// initialize formatter

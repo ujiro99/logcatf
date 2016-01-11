@@ -21,8 +21,8 @@ func TestRun_ReplaceColorCode(t *testing.T) {
 
 func TestRun_Fprintln_enable(t *testing.T) {
 
-	format := "%t %p [blue]%m"
-	expect := "\033[31m%t %p \033[34m%m"
+	format := "%t %p [_blue_]%m"
+	expect := "\033[31m%t %p \033[44m%m"
 
 	item := LogcatItem{
 		"time":     "12-28 19:01:14.073",
@@ -32,7 +32,8 @@ func TestRun_Fprintln_enable(t *testing.T) {
 	w := new(bytes.Buffer)
 
 	f := Fmtc{}
-	f.SetUp(true)
+	cc := ColorConfig{}
+	f.SetUp(true, cc)
 	format = f.ReplaceColorCode(format)
 	f.Fprintln(w, format, item)
 
@@ -56,7 +57,7 @@ func TestRun_Fprintln_disable(t *testing.T) {
 	w := new(bytes.Buffer)
 
 	f := Fmtc{}
-	f.SetUp(false)
+	f.SetUp(false, nil)
 	format = f.ReplaceColorCode(format)
 	f.Fprintln(w, format, item)
 

@@ -280,6 +280,26 @@ func toShiftJis(str string) string {
 	return buf.String()
 }
 
+func TestRun_color_priority(t *testing.T) {
+	cli := newCli()
+	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : logcat_messages:テスト")
+	out := new(bytes.Buffer)
+	cli.outStream = out
+
+	args := []string{"./logcatf", "%p [bold]%m", "--color", "--color-i", "blue"}
+	status := cli.Run(args)
+
+	if status == ExitCodeError {
+		t.Errorf("expected %d to eq %d", status, ExitCodeError)
+	}
+
+	expect := "\033[34mI \033[1mlogcat_messages:テスト"
+	str := out.String()
+	if !strings.Contains(str, expect) {
+		t.Errorf("expect: \"%s\"\nresult: \"%s\"", expect, str)
+	}
+}
+
 func BenchmarkDefault(b *testing.B) {
 	cli := newCli()
 	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : message")
@@ -324,7 +344,7 @@ func BenchmarkExecCommand(b *testing.B) {
 	}
 }
 
-func BenchmarkCollor(b *testing.B) {
+func BenchmarkColor(b *testing.B) {
 	cli := newCli()
 	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : message")
 	args := []string{"./logcatf", "--color"}

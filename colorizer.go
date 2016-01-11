@@ -84,6 +84,9 @@ type Fmtc struct {
 	context colorstring.Colorize
 }
 
+// ColorConfig has configuration for colorize.
+type ColorConfig map[string]string
+
 // Fprintln prints string according to color settings.
 func (f *Fmtc) Fprintln(writer io.Writer, str string, item LogcatItem) {
 	color, ok := priorityColors[item["priority"]]
@@ -94,7 +97,15 @@ func (f *Fmtc) Fprintln(writer io.Writer, str string, item LogcatItem) {
 }
 
 // SetUp color settings.
-func (f *Fmtc) SetUp(colorEnable bool) {
+func (f *Fmtc) SetUp(colorEnable bool, config ColorConfig) {
+
+	for k, v := range config {
+		if v == "" {
+			continue
+		}
+		priorityColors[k] = v
+	}
+
 	c := colorstring.Colorize{
 		Colors:  f.generateColorMap(),
 		Disable: !colorEnable,
@@ -116,8 +127,8 @@ func (f *Fmtc) generateColorMap() map[string]string {
 // ReplaceColorCode replaces colorCode in format, to be safety.
 func (f *Fmtc) ReplaceColorCode(format string) string {
 	for _, pair := range defaultColors {
-		oldKey := pair[defaultColorsKey]
-		newKey := prefix + pair[defaultColorsKey]
+		oldKey := "[" + pair[defaultColorsKey] + "]"
+		newKey := "[" + prefix + pair[defaultColorsKey] + "]"
 		format = strings.Replace(format, oldKey, newKey, flagAll)
 	}
 	return format
