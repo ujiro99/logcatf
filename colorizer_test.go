@@ -9,7 +9,7 @@ import (
 func TestRun_ReplaceColorCode(t *testing.T) {
 
 	before := "%t [blue] %m"
-	expect := "%t [logcatf_blue] %m"
+	expect := "%t [LOGCATF_blue] %m"
 
 	f := Colorizer{}
 	after := f.ReplaceColorCode(before)
