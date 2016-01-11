@@ -41,7 +41,7 @@ Other Flags:
 |   %a  | left-align               |
 |  %8a  | min-width 8, right-align |
 | %-8a  | min-width 8, left-align  |
-| %8.8a | width 8, left-align      |
+| %8.8a | width 8, right-align      |
 
 
 Default Format:
