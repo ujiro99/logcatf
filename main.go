@@ -14,8 +14,8 @@ func init() {
 func main() {
 	cli := &CLI{
 		inStream:  os.Stdin,
-		outStream: os.Stdout,
-		errStream: os.Stderr,
+		outStream: colorable.NewColorableStdout(),
+		errStream: colorable.NewColorableStderr(),
 	}
 	os.Exit(cli.Run(os.Args))
 }
