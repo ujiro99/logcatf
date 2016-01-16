@@ -152,7 +152,7 @@ func BenchmarkParse(b *testing.B) {
 	}
 }
 
-func BenchmarkFindFormat(b *testing.B) {
+func BenchmarkParse_FindFormat(b *testing.B) {
 	parser := logcatParser{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -160,7 +160,7 @@ func BenchmarkFindFormat(b *testing.B) {
 	}
 }
 
-func BenchmarkSearch(b *testing.B) {
+func BenchmarkParse_Search(b *testing.B) {
 	parser := logcatParser{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

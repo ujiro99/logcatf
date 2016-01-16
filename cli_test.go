@@ -311,6 +311,25 @@ func BenchmarkDefault(b *testing.B) {
 	}
 }
 
+func BenchmarkDefault_parseLine(b *testing.B) {
+	cli := newCli()
+	line := "12-28 18:54:07.180   930   931 I my_app  : message"
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		cli.parseLine(line)
+	}
+}
+
+func BenchmarkDefault_execute(b *testing.B) {
+	cli := newCli()
+	line := "12-28 18:54:07.180   930   931 I my_app  : message"
+	item := cli.parseLine(line)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		cli.execute(line, item)
+	}
+}
+
 func BenchmarkEncodeShiftJis(b *testing.B) {
 	cli := newCli()
 	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : message")

@@ -81,6 +81,5 @@ func (p *logcatParser) findFormat(line string) string {
 			return format
 		}
 	}
-
 	return ""
 }
