@@ -2,13 +2,14 @@ package main
 
 import (
 	"bufio"
-	"github.com/Maki-Daisuke/go-lines"
 	"os"
 	"testing"
+
+	"github.com/Maki-Daisuke/go-lines"
 )
 
 var (
-	parsedHas = map[string]map[string]bool{
+	parsedContains = map[string]map[string]bool{
 		"brief":      map[string]bool{"time": false, "pid": true, "tid": false, "priority": true, "tag": true, "message": true},
 		"process":    map[string]bool{"time": false, "pid": true, "tid": false, "priority": true, "tag": true, "message": true},
 		"tag":        map[string]bool{"time": false, "pid": false, "tid": false, "priority": true, "tag": true, "message": true},
@@ -20,12 +21,21 @@ var (
 	// TODO not supported yet.
 	//"long", "ddms_save"
 	logPatterns = map[string]string{
-		"brief":      "I/auditd  (  930): type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295",
-		"process":    "I(  930) type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295  (auditd)",
-		"tag":        "I/auditd  : type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295",
-		"time":       "12-28 18:54:07.180 I/auditd  (  930): type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295",
-		"threadtime": "12-28 18:54:07.180   930   930 I auditd  : type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295",
-		"raw":        "type=1403 audit(0.0:2): policy loaded auid=4294967295 ses=4294967295",
+		"brief":      "I/tag_value  (  930): message_value",
+		"process":    "I(  930) message_value  (tag_value)",
+		"tag":        "I/tag_value  : message_value",
+		"time":       "01-01 00:00:00.000 I/tag_value  (  930): message_value",
+		"threadtime": "01-01 00:00:00.000   930   931 I tag_value  : message_value",
+		"raw":        "message_value",
+	}
+
+	parsedValue = map[string]map[string]string{
+		"brief":      map[string]string{"pid": "930", "priority": "I", "tag": "tag_value", "message": "message_value"},
+		"process":    map[string]string{"pid": "930", "priority": "I", "tag": "tag_value", "message": "message_value"},
+		"tag":        map[string]string{"priority": "I", "tag": "tag_value", "message": "message_value"},
+		"time":       map[string]string{"time": "01-01 00:00:00.000", "pid": "930", "priority": "I", "tag": "tag_value", "message": "message_value"},
+		"threadtime": map[string]string{"time": "01-01 00:00:00.000", "pid": "930", "tid": "931", "priority": "I", "tag": "tag_value", "message": "message_value"},
+		"raw":        map[string]string{"message": "message_value"},
 	}
 
 	logPatternsHasSpace = map[string]string{
@@ -57,7 +67,8 @@ func TestFindFormat(t *testing.T) {
 	}
 }
 
-func TestParse_allFormat(t *testing.T) {
+func TestParse_in_test_dir(t *testing.T) {
+	parser := logcatParser{}
 	for format := range logPatterns {
 
 		filename := logPrefix + format + logExt
@@ -66,13 +77,11 @@ func TestParse_allFormat(t *testing.T) {
 			t.Errorf("os.Open: %v", err)
 		}
 		defer fp.Close()
-
-		parser := logcatParser{}
 		for line := range lines.Lines(bufio.NewReader(fp)) {
 			// logfile has 2 formats, raw and some else.
 			// "--------- beginning of *" must be used raw format.
 			item := parser.Parse(line)
-			expect := parsedHas[parser.findFormat(line)]
+			expect := parsedContains[parser.findFormat(line)]
 			for key, hasValue := range expect {
 				if hasValue {
 					_, ok := item[key]
@@ -80,6 +89,19 @@ func TestParse_allFormat(t *testing.T) {
 						t.Errorf("%s must has value", key)
 					}
 				}
+			}
+		}
+	}
+}
+
+func TestParse_value(t *testing.T) {
+	parser := logcatParser{}
+	for format, line := range logPatterns {
+		item := parser.Parse(line)
+		expectItem := parsedValue[format]
+		for key, val := range expectItem {
+			if val != item[key] {
+				t.Errorf("\nexpect: %s\nparsed: %s", val, item[key])
 			}
 		}
 	}
@@ -99,7 +121,7 @@ func TestParse_removeTailSpace(t *testing.T) {
 	for format, log := range logPatternsHasSpace {
 		item := parser.Parse(log)
 		for key, expect := range expects {
-			if parsedHas[format][key] && expect != item[key] {
+			if parsedContains[format][key] && expect != item[key] {
 				t.Errorf("on %s, \"%s\" must eq \"%s\"", format, item[key], expect)
 			}
 		}
@@ -115,7 +137,7 @@ func TestParse_hasTabInMessage(t *testing.T) {
 	for format, log := range logPatternsHasTab {
 		item := parser.Parse(log)
 		for key, expect := range expects {
-			if parsedHas[format][key] && expect != item[key] {
+			if parsedContains[format][key] && expect != item[key] {
 				t.Errorf("on %s, \"%s\" must eq \"%s\"", format, item[key], expect)
 			}
 		}
@@ -142,6 +164,6 @@ func BenchmarkSearch(b *testing.B) {
 	parser := logcatParser{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		parser.search(logPatterns["threadtime"], patterns["threadtime"])
+		parser.search(logPatterns["threadtime"], "threadtime")
 	}
 }

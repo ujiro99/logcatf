@@ -1,8 +1,9 @@
 package main
 
 import (
-	log "github.com/Sirupsen/logrus"
 	"regexp"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // Parser parse logcat to struct.
@@ -26,15 +27,26 @@ var (
 		"raw",
 	}
 
+	// key list for analyze logcat.
+	paramOrderMap = map[string][]string{
+		"brief":      []string{"priority", "tag", "pid", "message"},
+		"process":    []string{"priority", "pid", "message", "tag"},
+		"tag":        []string{"priority", "tag", "message"},
+		"time":       []string{"time", "priority", "tag", "pid", "message"},
+		"threadtime": []string{"time", "pid", "tid", "priority", "tag", "message"},
+		"ddms_save":  []string{"time", "priority", "tag", "pid", "message"},
+		"raw":        []string{"message"},
+	}
+
 	// regex pattrens for analyze logcat.
-	patterns = map[string]*regexp.Regexp{
-		"brief":      regexp.MustCompile(`^(?P<priority>[VDIWEAF])\/(?P<tag>.*?)\s*\(\s*(?P<pid>\d+)\):\s(?P<message>.*?)\s*$`),
-		"process":    regexp.MustCompile(`^(?P<priority>[VDIWEAF])\(\s*(?P<pid>\d+)\)\s(?P<message>.*?)\s*\((?P<tag>.*)\)$`),
-		"tag":        regexp.MustCompile(`^(?P<priority>[VDIWEAF])\/(?P<tag>.*?)\s*:\s(?P<message>.*?)\s*$`),
-		"time":       regexp.MustCompile(`^(?P<time>\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+):*\s(?P<priority>[VDIWEAF])\/(?P<tag>.*?)\s*\(\s*(?P<pid>\d+)\):\s(?P<message>.*?)\s*$`),
-		"threadtime": regexp.MustCompile(`^(?P<time>\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+)\s*(?P<pid>\d+)\s*(?P<tid>\d+)\s(?P<priority>[VDIWEAF])\s(?P<tag>.*?)\s*:\s(?P<message>.*?)\s*$`),
-		"ddms_save":  regexp.MustCompile(`^(?P<time>\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+):*\s(?P<priority>VERBOSE|DEBUG|ERROR|WARN|INFO|ASSERT)\/(?P<tag>.*?)\((?P<pid>\s*\d+)\):\s(?P<message>.*?)\s*$`),
-		"raw":        regexp.MustCompile(`^(?P<message>.*?)\s*$`),
+	patternMap = map[string]*regexp.Regexp{
+		"brief":      regexp.MustCompile(`^([VDIWEAF])\/(.*?)\s*\(\s*(\d+)\):\s(.*?)\s*$`),
+		"process":    regexp.MustCompile(`^([VDIWEAF])\(\s*(\d+)\)\s(.*?)\s*\((.*)\)$`),
+		"tag":        regexp.MustCompile(`^([VDIWEAF])\/(.*?)\s*:\s(.*?)\s*$`),
+		"time":       regexp.MustCompile(`^(\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+):*\s([VDIWEAF])\/(.*?)\s*\(\s*(\d+)\):\s(.*?)\s*$`),
+		"threadtime": regexp.MustCompile(`^(\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+)\s*(\d+)\s*(\d+)\s([VDIWEAF])\s(.*?)\s*:\s(.*?)\s*$`),
+		"ddms_save":  regexp.MustCompile(`^(\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+):*\s(VERBOSE|DEBUG|ERROR|WARN|INFO|ASSERT)\/(.*?)\((\s*\d+)\):\s(.*?)\s*$`),
+		"raw":        regexp.MustCompile(`^(.*?)\s*$`),
 	}
 )
 
@@ -45,18 +57,18 @@ func (p *logcatParser) Parse(line string) LogcatItem {
 		log.Warnf("Parse failed: %s", line)
 		return nil
 	}
-	item := p.search(line, patterns[logFormat])
+	item := p.search(line, logFormat)
 	return item
 }
 
 // search keyword using regex pattern.
-func (p *logcatParser) search(line string, pattern *regexp.Regexp) LogcatItem {
+func (p *logcatParser) search(line string, format string) LogcatItem {
+	pattern := patternMap[format]
 	match := pattern.FindStringSubmatch(line)
 	item := LogcatItem{}
-	for i, key := range pattern.SubexpNames() {
-		if i != 0 {
-			item[key] = match[i]
-		}
+	for i, val := range match[1:] {
+		key := paramOrderMap[format][i]
+		item[key] = val
 	}
 	return item
 }
@@ -64,7 +76,7 @@ func (p *logcatParser) search(line string, pattern *regexp.Regexp) LogcatItem {
 // findFormat analyze a line and find out logcat format.
 func (p *logcatParser) findFormat(line string) string {
 	for _, format := range formats {
-		re, ok := patterns[format]
+		re, ok := patternMap[format]
 		if ok && re.MatchString(line) {
 			return format
 		}
