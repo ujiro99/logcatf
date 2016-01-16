@@ -15,7 +15,7 @@ func Test_IfMatch(t *testing.T) {
 		Stdout:  new(bytes.Buffer),
 		trigger: regexp.MustCompile("a"),
 	}
-	res := e.IfMatch(&line)
+	res := e.IfMatch(line)
 	if &e != res {
 		t.Errorf("trigger should mathes line.")
 	}
@@ -28,7 +28,7 @@ func Test_IfMatch_not_match(t *testing.T) {
 		Stdout:  new(bytes.Buffer),
 		trigger: regexp.MustCompile("a"),
 	}
-	res := e.IfMatch(&line)
+	res := e.IfMatch(line)
 	if &e == res {
 		t.Errorf("IfMatch should returns emptyExecutor.")
 	}
@@ -44,7 +44,7 @@ func Test_Exec(t *testing.T) {
 		Stdout:  out,
 		command: &command,
 	}
-	e.Exec(&item)
+	e.Exec(item)
 	<-time.After(time.Second / 100)
 
 	if !strings.Contains(out.String(), expect) {
@@ -58,7 +58,7 @@ func Test_Exec_empty(t *testing.T) {
 
 	out := new(bytes.Buffer)
 	e := emptyExecutor{}
-	e.Exec(&item)
+	e.Exec(item)
 	<-time.After(time.Second / 100)
 
 	if strings.Contains(out.String(), expect) {

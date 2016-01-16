@@ -4,12 +4,13 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
 const (

@@ -45,7 +45,7 @@ func (cli *CLI) Run(args []string) int {
 	// let's start
 	for line := range lines.Lines(cli.inStream) {
 		item := cli.parseLine(line)
-		cli.execute(&line, &item)
+		cli.execute(line, item)
 	}
 
 	log.Debugf("run finished")
@@ -148,7 +148,7 @@ func (cli *CLI) initialize(args []string) error {
 }
 
 // execute calls multiple executers.
-func (cli *CLI) execute(line *string, item *LogcatItem) {
+func (cli *CLI) execute(line string, item LogcatItem) {
 	for _, e := range cli.executors {
 		e.IfMatch(line).Exec(item)
 	}

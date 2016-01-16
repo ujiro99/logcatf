@@ -16,10 +16,10 @@ type Executor interface {
 	// IfMatch watches logcat line.
 	// - if line matches trigger, returns executer.
 	// - if line not matches trigger, returns emptyExecuter.
-	IfMatch(line *string) Executor
+	IfMatch(line string) Executor
 
 	// Exec command.
-	Exec(item *LogcatItem)
+	Exec(item LogcatItem)
 }
 
 // implements Executer.
@@ -30,8 +30,8 @@ type executor struct {
 }
 
 // check a line. implements Executer.
-func (e *executor) IfMatch(line *string) Executor {
-	if line == nil || !e.trigger.MatchString(*line) {
+func (e *executor) IfMatch(line string) Executor {
+	if line == "" || !e.trigger.MatchString(line) {
 		return &emptyExecutor{}
 	}
 	log.Debugf("--execute on: \"%s\" ", e.trigger.String())
@@ -39,12 +39,12 @@ func (e *executor) IfMatch(line *string) Executor {
 }
 
 // execute command. implements Executer.
-func (e *executor) Exec(item *LogcatItem) {
+func (e *executor) Exec(item LogcatItem) {
 	log.Debugf("--command start: \"%s\"", *e.command)
 
 	if item != nil {
 		for _, k := range item.Keys() {
-			os.Setenv(k, (*item)[k])
+			os.Setenv(k, item[k])
 		}
 	}
 
@@ -69,10 +69,10 @@ type emptyExecutor struct {
 }
 
 // don't execute command.
-func (e *emptyExecutor) IfMatch(line *string) Executor {
+func (e *emptyExecutor) IfMatch(line string) Executor {
 	return &emptyExecutor{}
 }
 
 // don't execute command.
-func (e *emptyExecutor) Exec(item *LogcatItem) {
+func (e *emptyExecutor) Exec(item LogcatItem) {
 }
