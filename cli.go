@@ -147,7 +147,7 @@ func (cli *CLI) initialize(args []string) error {
 	return formatter.Verify()
 }
 
-// execute calls multiple executers.
+// execute calls multiple executors.
 func (cli *CLI) execute(line string, item LogcatItem) {
 	for _, e := range cli.executors {
 		e.IfMatch(line).Exec(item)

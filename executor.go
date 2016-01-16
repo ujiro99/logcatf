@@ -29,10 +29,14 @@ type executor struct {
 	Stdout  io.Writer
 }
 
+var (
+	empty = emptyExecutor{}
+)
+
 // check a line. implements Executer.
 func (e *executor) IfMatch(line string) Executor {
 	if line == "" || !e.trigger.MatchString(line) {
-		return &emptyExecutor{}
+		return &empty
 	}
 	log.Debugf("--execute on: \"%s\" ", e.trigger.String())
 	return e
@@ -70,7 +74,7 @@ type emptyExecutor struct {
 
 // don't execute command.
 func (e *emptyExecutor) IfMatch(line string) Executor {
-	return &emptyExecutor{}
+	return e
 }
 
 // don't execute command.

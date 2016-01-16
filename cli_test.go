@@ -315,6 +315,7 @@ func BenchmarkDefault(b *testing.B) {
 func BenchmarkDefault_parseLine(b *testing.B) {
 	cli := newCli()
 	line := "12-28 18:54:07.180   930   931 I my_app  : message"
+	cli.initialize([]string{"./logcatf", "%t %i %I %p %a: %m"})
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		cli.parseLine(line)
@@ -324,6 +325,18 @@ func BenchmarkDefault_parseLine(b *testing.B) {
 func BenchmarkDefault_execute(b *testing.B) {
 	cli := newCli()
 	line := "12-28 18:54:07.180   930   931 I my_app  : message"
+	cli.initialize([]string{"./logcatf", "%t %i %I %p %a: %m", "-o=\".\"", "-c=\"echo test\""})
+	item := cli.parseLine(line)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		cli.execute(line, item)
+	}
+}
+
+func BenchmarkDefault_execute_empty(b *testing.B) {
+	cli := newCli()
+	line := "12-28 18:54:07.180   930   931 I my_app  : message"
+	cli.initialize([]string{"./logcatf", "%t %i %I %p %a: %m"})
 	item := cli.parseLine(line)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
