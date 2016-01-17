@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"regexp"
 	"runtime"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -31,6 +32,24 @@ type executor struct {
 
 var (
 	empty = emptyExecutor{}
+
+	flagMapLinux = map[string]string{
+		"%t": "${time}",
+		"%i": "${pid}",
+		"%I": "${tid}",
+		"%p": "${priority}",
+		"%a": "${tag}",
+		"%m": "${message}",
+	}
+
+	flagMapWindows = map[string]string{
+		"%t": "%time%",
+		"%i": "%pid%",
+		"%I": "%tid%",
+		"%p": "%priority%",
+		"%a": "%tag%",
+		"%m": "%message%",
+	}
 )
 
 // check a line. implements Executer.
@@ -54,8 +73,12 @@ func (e *executor) Exec(item LogcatItem) {
 
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
+		command := e.replaceFlags(*e.command, flagMapWindows)
+		e.command = &command
 		cmd = exec.Command(os.Getenv("COMSPEC"), "/c", *e.command)
 	} else {
+		command := e.replaceFlags(*e.command, flagMapLinux)
+		e.command = &command
 		cmd = exec.Command(os.Getenv("SHELL"), "-c", *e.command)
 	}
 	cmd.Stdout = e.Stdout
@@ -66,6 +89,14 @@ func (e *executor) Exec(item LogcatItem) {
 	// cmd.Wait()
 
 	log.Debugf("--command finish: \"%s\"", *e.command)
+}
+
+// replace variable flags in command.
+func (e *executor) replaceFlags(cmd string, flags map[string]string) string {
+	for k, v := range flags {
+		cmd = strings.Replace(cmd, k, v, flagAll)
+	}
+	return cmd
 }
 
 // implements Executer. but not execute anything.

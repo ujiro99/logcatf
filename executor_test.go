@@ -52,6 +52,24 @@ func Test_Exec(t *testing.T) {
 	}
 }
 
+func Test_Exec_useFlag(t *testing.T) {
+	expect := "test"
+	command := "echo %m"
+	item := LogcatItem{"message": expect}
+
+	out := new(bytes.Buffer)
+	e := executor{
+		Stdout:  out,
+		command: &command,
+	}
+	e.Exec(item)
+	<-time.After(time.Second / 100)
+
+	if !strings.Contains(out.String(), expect) {
+		t.Errorf("expect %s to eq \"%s\"", out.String(), expect)
+	}
+}
+
 func Test_Exec_empty(t *testing.T) {
 	expect := "test"
 	item := LogcatItem{"message": expect}
