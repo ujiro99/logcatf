@@ -339,6 +339,38 @@ func BenchmarkDefault_initialize(b *testing.B) {
 	}
 }
 
+func BenchmarkDefault_initialize_colorizer(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		fmtc = Colorizer{}
+		config := ColorConfig{
+			"V": "[red]",
+			"D": "[red]",
+			"I": "[red]",
+			"W": "[red]",
+			"E": "[red]",
+			"F": "[red]",
+		}
+		fmtc.Init(true, config)
+	}
+}
+
+func BenchmarkDefault_initialize_formatter(b *testing.B) {
+	cli := newCli()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		cli.initFormatter(false, "%t %i %I %p %a: %m")
+	}
+}
+
+func BenchmarkDefault_initialize_writer(b *testing.B) {
+	cli := newCli()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		cli.initWriter(false, "")
+	}
+}
+
 func BenchmarkDefault_parseLine(b *testing.B) {
 	cli := newCli()
 	line := "12-28 18:54:07.180   930   931 I my_app  : message"

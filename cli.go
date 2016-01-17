@@ -117,6 +117,7 @@ func (cli *CLI) initialize(args []string) error {
 	return formatter.Verify()
 }
 
+// initialize Formatter
 func (cli *CLI) initFormatter(toCsv bool, format string) {
 	if toCsv {
 		if format == DefaultFormat {
