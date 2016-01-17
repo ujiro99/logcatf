@@ -33,7 +33,7 @@ func TestRun_Fprintln_enable(t *testing.T) {
 
 	f := Colorizer{}
 	cc := ColorConfig{}
-	f.SetUp(true, cc)
+	f.Init(true, cc)
 	format = f.ReplaceColorCode(format)
 	f.Fprintln(w, format, item)
 
@@ -57,7 +57,7 @@ func TestRun_Fprintln_disable(t *testing.T) {
 	w := new(bytes.Buffer)
 
 	f := Colorizer{}
-	f.SetUp(false, nil)
+	f.Init(false, nil)
 	format = f.ReplaceColorCode(format)
 	f.Fprintln(w, format, item)
 

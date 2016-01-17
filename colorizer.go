@@ -97,7 +97,7 @@ func (f *Colorizer) Fprintln(writer io.Writer, str string, item LogcatItem) {
 }
 
 // SetUp color settings.
-func (f *Colorizer) SetUp(colorEnable bool, config ColorConfig) {
+func (f *Colorizer) Init(colorEnable bool, config ColorConfig) {
 
 	for k, v := range config {
 		if v == "" {

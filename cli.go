@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"regexp"
 	"runtime"
 
 	"github.com/Maki-Daisuke/go-lines"
@@ -87,25 +88,6 @@ func (cli *CLI) initialize(args []string) error {
 	app.Version(Version)
 	kingpin.MustParse(app.Parse(args[1:]))
 
-	// initialize executor
-	if *triggers == nil {
-		// if trigger not exists, not execute anything.
-		cli.executors = []Executor{&emptyExecutor{}}
-	} else {
-		if len(*triggers) != len(*commands) {
-			return &ParameterError{Message["msgCommandNumMismatch"]}
-		}
-		es := []Executor{}
-		for i, t := range *triggers {
-			es = append(es, &executor{
-				trigger: t,
-				command: &(*commands)[i],
-				Stdout:  cli.errStream,
-			})
-		}
-		cli.executors = es
-	}
-
 	// initialize colorizer
 	config := ColorConfig{
 		"V": *colorV,
@@ -116,26 +98,45 @@ func (cli *CLI) initialize(args []string) error {
 		"F": *colorF,
 	}
 	fmtc = Colorizer{}
-	fmtc.SetUp(*color, config)
-	newFormat := fmtc.ReplaceColorCode(*format)
+	fmtc.Init(*color, config)
 
-	// initialize formatter
-	if *toCsv {
-		if *format == DefaultFormat {
-			newFormat = AllFormat
+	parser = &logcatParser{}
+	cli.initFormatter(*toCsv, *format)
+	cli.initWriter(*toCsv, *encode)
+
+	err := cli.initExecutors(*triggers, *commands)
+	if err != nil {
+		return err
+	}
+
+	log.WithFields(log.Fields{
+		"format":  *format,
+		"trigger": *triggers,
+		"command": *commands}).Debug("Parameter initialized.")
+
+	return formatter.Verify()
+}
+
+func (cli *CLI) initFormatter(toCsv bool, format string) {
+	if toCsv {
+		if format == DefaultFormat {
+			format = AllFormat
 		}
-		formatter = NewCsvFormatter(newFormat)
+		formatter = NewCsvFormatter(format)
 	} else {
-		formatter = &defaultFormatter{format: &newFormat}
+		format := fmtc.ReplaceColorCode(format)
+		formatter = &defaultFormatter{format: &format}
 	}
 	// convert format (long => short)
 	formatter.Normarize()
+}
 
-	// initialize writer
-	if *toCsv && runtime.GOOS == Windows && *encode == "" {
-		*encode = ShiftJIS
+// initialize Writer
+func (cli *CLI) initWriter(toCsv bool, encode string) {
+	if toCsv && runtime.GOOS == Windows && encode == "" {
+		encode = ShiftJIS
 	}
-	switch *encode {
+	switch encode {
 	case ShiftJIS:
 		writer = transform.NewWriter(cli.outStream, japanese.ShiftJIS.NewEncoder())
 	case EUCJP:
@@ -145,16 +146,28 @@ func (cli *CLI) initialize(args []string) error {
 	default:
 		writer = cli.outStream
 	}
+}
 
-	// initialize parser
-	parser = &logcatParser{}
-
-	log.WithFields(log.Fields{
-		"format":  *format,
-		"trigger": *triggers,
-		"command": *commands}).Debug("Parameter initialized.")
-
-	return formatter.Verify()
+// initialize Executors
+func (cli *CLI) initExecutors(triggers []*regexp.Regexp, commands []string) error {
+	if triggers == nil {
+		// if trigger not exists, not execute anything.
+		cli.executors = []Executor{&emptyExecutor{}}
+	} else {
+		if len(triggers) != len(commands) {
+			return &ParameterError{Message["msgCommandNumMismatch"]}
+		}
+		es := []Executor{}
+		for i, t := range triggers {
+			es = append(es, &executor{
+				trigger: t,
+				command: &(commands)[i],
+				Stdout:  cli.errStream,
+			})
+		}
+		cli.executors = es
+	}
+	return nil
 }
 
 // execute calls multiple executors.
