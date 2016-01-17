@@ -312,6 +312,14 @@ func BenchmarkDefault(b *testing.B) {
 	}
 }
 
+func BenchmarkDefault_initialize(b *testing.B) {
+	cli := newCli()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		cli.initialize([]string{"./logcatf", "%t %i %I %p %a: %m", "-o=\".\"", "-c=\"echo test\""})
+	}
+}
+
 func BenchmarkDefault_parseLine(b *testing.B) {
 	cli := newCli()
 	line := "12-28 18:54:07.180   930   931 I my_app  : message"
