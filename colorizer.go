@@ -127,7 +127,7 @@ var colorMap = map[string]string{
 // priorityColors represents default color of priority.
 var priorityColors = map[string]string{
 	"V": "default",
-	"D": "default",
+	"D": "blue",
 	"I": "default",
 	"W": "yellow",
 	"E": "red",
