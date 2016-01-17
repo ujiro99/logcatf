@@ -71,7 +71,7 @@ func (cli *CLI) initialize(args []string) error {
 		format   = app.Arg("format", Message["helpFormat"]).Default(DefaultFormat).String()
 		triggers = app.Flag("on", Message["helpTrigger"]).Short('o').RegexpList()
 		commands = app.Flag("command", Message["helpCommand"]).Short('c').Strings()
-		encode   = app.Flag("encode", Message["helpEncode"]).String()
+		encode   = app.Flag("encode", Message["helpEncode"]).Default(UTF8).String()
 		toCsv    = app.Flag("to-csv", Message["helpToCsv"]).Bool()
 		color    = app.Flag("color", Message["helpToColor"]).Bool()
 
@@ -130,9 +130,14 @@ func (cli *CLI) initialize(args []string) error {
 	formatter.Normarize()
 
 	// initialize writer
-	if *encode == ShiftJIS {
+	switch *encode {
+	case ShiftJIS:
 		writer = transform.NewWriter(cli.outStream, japanese.ShiftJIS.NewEncoder())
-	} else {
+	case EUCJP:
+		writer = transform.NewWriter(cli.outStream, japanese.EUCJP.NewEncoder())
+	case ISO2022JP:
+		writer = transform.NewWriter(cli.outStream, japanese.ISO2022JP.NewEncoder())
+	default:
 		writer = cli.outStream
 	}
 

@@ -11,6 +11,10 @@ const (
 	UTF8 = "utf-8"
 	// ShiftJIS represents encode `shift-jis`
 	ShiftJIS = "shift-jis"
+	// EUCJP represents encode `euc-jp`
+	EUCJP = "euc-jp"
+	// ISO2022JP represents encode `iso-2022-jp`
+	ISO2022JP = "iso-2022-jp"
 )
 
 // Message has message strings.
@@ -28,7 +32,7 @@ var Message = map[string]string{
    "%t [invert] %p [reset] %a: %m"`,
 	"helpTrigger":           "regex to trigger a COMMAND.",
 	"helpCommand":           "COMMAND will be executed on regex mathed. In COMMAND, you can use parsed logcat as environment variables. ex) `\\${message}` ** You need to escape a dollar mark. **",
-	"helpEncode":            "output character encode.",
+	"helpEncode":            "output character encode. { utf-8 | shift-jis | euc-jp | iso-2022-jp }",
 	"helpToCsv":             "output to CSV format. double-quote will be escaped.",
 	"helpToColor":           "enable ANSI color. In format, you can use color tags. ex) [blue], [_red_], [bold], [reset], and more.",
 	"helpToColorV":          "- color for verbose.",
