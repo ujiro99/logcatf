@@ -159,6 +159,7 @@ func (f *Colorizer) Init(colorEnable bool, config ColorConfig) {
 			continue
 		}
 		priorityColors[k] = v
+		colorEnable = true
 	}
 
 	c := colorstring.Colorize{
