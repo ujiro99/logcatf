@@ -2,20 +2,28 @@
 
 A Command line tool for format Android Logcat.
 
+Use like this.
+```bash
+$ adb logcat -v time | logcatf --color
+```
+
+Output:
 ![ScreenShot](./screenshot.png?raw=true "Logcatf")
+
 
 ## Examples
 
 ```bash
 # show time, pid and message formatted.
-$ adb logcat -v time | logcatf "%time %4i %message"
+$ adb logcat -v time | logcatf "%t %4i %m"
 
 # output to csv format.
-$ adb logcat -v threadtime | logcatf "%t %a %p %i %I %m" --to-csv > logcat.csv
+$ adb logcat -v threadtime | logcatf --to-csv > logcat.csv
 
 # get screencap on Exception
 $ adb logcat -v time | logcatf -o "MY_APP.*Error" -c "adb shell screencap -p /sdcard/a.png"
 ```
+
 
 ## Install
 
@@ -28,6 +36,7 @@ or, use `go get`:
 ```bash
 $ go get github.com/ujiro99/logcatf
 ```
+
 
 ## Basic Usage
 
@@ -53,14 +62,16 @@ Other Flags:
 |   %a  | left-align               |
 |  %8a  | min-width 8, right-align |
 | %-8a  | min-width 8, left-align  |
-| %8.8a | width 8, right-align      |
+| %8.8a | width 8, right-align     |
 
 
 Default Format:
 
     "%t %p %a: %m"
 
+
 ## Options
+
 
 ### execute commands
 
@@ -68,13 +79,12 @@ You can execute other commands when a keyword matched to Logcat.
 
     -o, --on=ON              regex to trigger a COMMAND.
     -c, --command=COMMAND    COMMAND will be executed on regex matched.
-                             In COMMAND, you can use parsed logcat as shell variables.
-
     
-* on Linux, You need to escape a dollar sign.
+* In COMMAND, you can use parsed logcat value using format same as format or environment variables.
 
 ```bash
-ex) -o "MY_APP.*Error" -c "echo \${message} > error.log"  # linux, mac
+ex) -o "MY_APP.*Error" -c "echo %m > error.log"
+    -o "MY_APP.*Error" -c "echo \${message} > error.log"  # linux, mac
     -o "MY_APP.*Error" -c "echo %message% > error.log"    # Windows
 ```
 
@@ -87,7 +97,10 @@ ex) -o "MY_APP.*Error" -c "echo \${message} > error.log"  # linux, mac
 output to CSV format.
 
         --to-csv             output to CSV format. double-quote will be escaped.
-        --encode=ENCODE      output character encode. { utf-8 | shift-jis }
+        --encode=ENCODE      output character encode. { utf-8 | shift-jis | euc-jp | iso-2022-jp }
+
+* if use on Windows, encode will be used shift-jis.
+
 
 ### Color
 
@@ -109,6 +122,7 @@ specify output Color.
 ```bash
 ex) $ adb logcat | logcatf "%t [invert] %a [reset] [_white_] %m" --color --color-i "cyan"
 ```
+
 
 Available Color Tags:
 
@@ -135,6 +149,7 @@ Available Color Tags:
 | reset      |
 | reset_bold |
 
+
 ## Contribution
 
 1. Fork ([https://github.com/ujiro99/logcatf/fork](https://github.com/ujiro99/logcatf/fork))
@@ -144,6 +159,7 @@ Available Color Tags:
 1. Run test suite with the `go test ./...` command and confirm that it passes
 1. Run `gofmt -s`
 1. Create a new Pull Request
+
 
 ## Author
 
