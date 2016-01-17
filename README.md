@@ -80,7 +80,7 @@ You can execute other commands when a keyword matched to Logcat.
     -o, --on=ON              regex to trigger a COMMAND.
     -c, --command=COMMAND    COMMAND will be executed on regex matched.
     
-* In COMMAND, you can use parsed logcat value using format same as format or environment variables.
+* In COMMAND, you can use parsed logcat value using keyword same as format or environment variables.
 
 ```bash
 ex) -o "MY_APP.*Error" -c "echo %m > error.log"
