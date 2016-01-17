@@ -148,6 +148,25 @@ func TestRun_formatShort(t *testing.T) {
 	}
 }
 
+func TestRun_toCsv_default(t *testing.T) {
+	cli := newCli()
+	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : hello, world.")
+	out := new(bytes.Buffer)
+	cli.outStream = out
+
+	args := []string{"./logcatf", "--to-csv"}
+	status := cli.Run(args)
+
+	if status != ExitCodeOK {
+		t.Errorf("expected %d to eq %d", status, ExitCodeOK)
+	}
+
+	expect := "12-28 18:54:07.180,I,my_app,930,931,\"hello, world.\""
+	str := out.String()
+	if !strings.Contains(str, expect) {
+		t.Errorf("\nexpect: %s\nresult: %s", expect, str)
+	}
+}
 func TestRun_toCsv(t *testing.T) {
 	cli := newCli()
 	cli.inStream = strings.NewReader("12-28 18:54:07.180   930   931 I my_app  : hello, world.")

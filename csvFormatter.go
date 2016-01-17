@@ -3,12 +3,25 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
+	"runtime"
 	"strings"
 )
 
 // implements Formatter
 type csvFormatter struct {
 	*defaultFormatter
+	buf *bytes.Buffer
+	w   *csv.Writer
+}
+
+func NewCsvFormatter(format string) Formatter {
+	buf := new(bytes.Buffer)
+	writer := csv.NewWriter(buf)
+	res := &csvFormatter{&defaultFormatter{format: &format}, buf, writer}
+	if runtime.GOOS == Windows {
+		res.w.UseCRLF = true
+	}
+	return res
 }
 
 // Format implements Formatter
@@ -28,9 +41,7 @@ func (f *csvFormatter) Format(item *LogcatItem) string {
 		}
 	}
 
-	buf := new(bytes.Buffer)
-	writer := csv.NewWriter(buf)
-	writer.Write(args)
-	writer.Flush()
-	return strings.TrimRight(buf.String(), "\r\n")
+	f.w.Write(args)
+	f.w.Flush()
+	return strings.TrimRight(f.buf.String(), "\r\n")
 }

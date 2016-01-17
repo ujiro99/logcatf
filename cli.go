@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"runtime"
 
 	"github.com/Maki-Daisuke/go-lines"
 	log "github.com/Sirupsen/logrus"
@@ -120,9 +121,10 @@ func (cli *CLI) initialize(args []string) error {
 
 	// initialize formatter
 	if *toCsv {
-		formatter = &csvFormatter{
-			&defaultFormatter{format: &newFormat},
+		if *format == DefaultFormat {
+			newFormat = AllFormat
 		}
+		formatter = NewCsvFormatter(newFormat)
 	} else {
 		formatter = &defaultFormatter{format: &newFormat}
 	}
@@ -130,6 +132,9 @@ func (cli *CLI) initialize(args []string) error {
 	formatter.Normarize()
 
 	// initialize writer
+	if *toCsv && runtime.GOOS == Windows && *encode == "" {
+		*encode = ShiftJIS
+	}
 	switch *encode {
 	case ShiftJIS:
 		writer = transform.NewWriter(cli.outStream, japanese.ShiftJIS.NewEncoder())

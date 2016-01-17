@@ -60,7 +60,7 @@ func ExampleLogcatItem_Format_all() {
 	// 12-28 19:01:14.073, GLSUser, 1836, 2720, W, at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)
 }
 
-func ExampleLogcatItem_Format_remainFrags() {
+func ExampleLogcatItem_Format_remainFlags() {
 	item := &LogcatItem{
 		"time":     "12-28 19:01:14.073",
 		"pid":      "1",
@@ -84,9 +84,7 @@ func ExampleLogcatItem_Format_toCsv() {
 	cli := newCli()
 	cli.outStream = os.Stdout
 	format := "%m %i"
-	f := csvFormatter{
-		&defaultFormatter{format: &format},
-	}
+	f := NewCsvFormatter(format)
 	fmt.Println(f.Format(item))
 	// Output:
 	// "aaa""bbb""ccc",1
