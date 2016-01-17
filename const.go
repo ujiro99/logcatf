@@ -15,6 +15,8 @@ const (
 	EUCJP = "euc-jp"
 	// ISO2022JP represents encode `iso-2022-jp`
 	ISO2022JP = "iso-2022-jp"
+	// Windows represents encode `windows`
+	Windows = "windows"
 )
 
 // Message has message strings.

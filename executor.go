@@ -72,7 +72,7 @@ func (e *executor) Exec(item LogcatItem) {
 	}
 
 	var cmd *exec.Cmd
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == Windows {
 		command := e.replaceFlags(*e.command, flagMapWindows)
 		e.command = &command
 		cmd = exec.Command(os.Getenv("COMSPEC"), "/c", *e.command)
