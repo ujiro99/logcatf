@@ -43,5 +43,7 @@ func (f *csvFormatter) Format(item *LogcatItem) string {
 
 	f.w.Write(args)
 	f.w.Flush()
-	return strings.TrimRight(f.buf.String(), "\r\n")
+	res := strings.TrimRight(f.buf.String(), "\r\n")
+	f.buf.Reset()
+	return res
 }
