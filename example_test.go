@@ -6,7 +6,7 @@ import (
 )
 
 func ExampleLogcatItem_Format_time_message() {
-	item := &LogcatItem{
+	item := &LogcatEntry{
 		"time":    "12-28 19:01:14.073",
 		"message": "at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)",
 	}
@@ -18,7 +18,7 @@ func ExampleLogcatItem_Format_time_message() {
 }
 
 func ExampleLogcatItem_Format_escapedCharactor() {
-	item := &LogcatItem{
+	item := &LogcatEntry{
 		"time":     "12-28 19:01:14.073",
 		"tag":      "GLSUser",
 		"priority": "W",
@@ -33,7 +33,7 @@ func ExampleLogcatItem_Format_escapedCharactor() {
 }
 
 func ExampleLogcatItem_Format_priority_missing() {
-	item := &LogcatItem{
+	item := &LogcatEntry{
 		"time":    "12-28 19:01:14.073",
 		"message": "at com.google.android.gms.auth.be.appcert.b.a(SourceFile:43)",
 	}
@@ -45,7 +45,7 @@ func ExampleLogcatItem_Format_priority_missing() {
 }
 
 func ExampleLogcatItem_Format_all() {
-	item := &LogcatItem{
+	item := &LogcatEntry{
 		"time":     "12-28 19:01:14.073",
 		"pid":      "1836",
 		"tid":      "2720",
@@ -61,7 +61,7 @@ func ExampleLogcatItem_Format_all() {
 }
 
 func ExampleLogcatItem_Format_remainFlags() {
-	item := &LogcatItem{
+	item := &LogcatEntry{
 		"time":     "12-28 19:01:14.073",
 		"pid":      "1",
 		"tid":      "2",
@@ -76,7 +76,7 @@ func ExampleLogcatItem_Format_remainFlags() {
 }
 
 func ExampleLogcatItem_Format_toCsv() {
-	item := &LogcatItem{
+	item := &LogcatEntry{
 		"pid":     "1",
 		"message": "aaa\"bbb\"ccc",
 	}

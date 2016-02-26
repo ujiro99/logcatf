@@ -25,7 +25,7 @@ var (
 // Formatter of logcatItem
 type Formatter interface {
 	// Format create a formatted string.
-	Format(item *LogcatItem) string
+	Format(item *LogcatEntry) string
 	// Verify checks a format
 	Verify() error
 	// Normarize convert long keys to short keys.
@@ -40,7 +40,7 @@ type defaultFormatter struct {
 // Format implements Formatter
 // replace %* keywords to real value. use short format.
 //   ex) "%t %a" => "12-28 19:01:14.073 GLSUser"
-func (f *defaultFormatter) Format(item *LogcatItem) string {
+func (f *defaultFormatter) Format(item *LogcatEntry) string {
 	matches := sformatRegex.FindAllStringSubmatch(*f.format, len(formatMap))
 	formatArgs := make([]interface{}, 0, len(matches))
 	// find matched keyword and store value on item

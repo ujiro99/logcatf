@@ -20,7 +20,7 @@ type Executor interface {
 	IfMatch(line string) Executor
 
 	// Exec command.
-	Exec(item LogcatItem)
+	Exec(item LogcatEntry)
 }
 
 // implements Executer.
@@ -62,7 +62,7 @@ func (e *executor) IfMatch(line string) Executor {
 }
 
 // execute command. implements Executer.
-func (e *executor) Exec(item LogcatItem) {
+func (e *executor) Exec(item LogcatEntry) {
 	log.Debugf("--command start: \"%s\"", *e.command)
 
 	if item != nil {
@@ -109,5 +109,5 @@ func (e *emptyExecutor) IfMatch(line string) Executor {
 }
 
 // don't execute command.
-func (e *emptyExecutor) Exec(item LogcatItem) {
+func (e *emptyExecutor) Exec(item LogcatEntry) {
 }

@@ -143,7 +143,7 @@ type Colorizer struct {
 type ColorConfig map[string]string
 
 // Fprintln prints string according to color settings.
-func (f *Colorizer) Fprintln(writer io.Writer, str string, item LogcatItem) {
+func (f *Colorizer) Fprintln(writer io.Writer, str string, item LogcatEntry) {
 	color, ok := priorityColors[item["priority"]]
 	if ok {
 		str = fmt.Sprintf("[%s%s]%s", prefix, color, str)

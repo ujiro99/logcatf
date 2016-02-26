@@ -7,7 +7,7 @@ import (
 
 // Parser parse logcat to struct.
 type Parser interface {
-	Parse(line string) (LogcatItem, error)
+	Parse(line string) (LogcatEntry, error)
 }
 
 // logcatParser implements Parser
@@ -50,7 +50,7 @@ var (
 )
 
 // Parse a line of logcat.
-func (p *logcatParser) Parse(line string) (LogcatItem, error) {
+func (p *logcatParser) Parse(line string) (LogcatEntry, error) {
 	logFormat := p.findFormat(line)
 	if logFormat == "" {
 		return nil, errors.New("Parse failed: " + line)
@@ -60,10 +60,10 @@ func (p *logcatParser) Parse(line string) (LogcatItem, error) {
 }
 
 // search keyword using regex pattern.
-func (p *logcatParser) search(line string, format string) LogcatItem {
+func (p *logcatParser) search(line string, format string) LogcatEntry {
 	pattern := patternMap[format]
 	match := pattern.FindStringSubmatch(line)
-	item := LogcatItem{}
+	item := LogcatEntry{}
 	for i, val := range match[1:] {
 		key := paramOrderMap[format][i]
 		item[key] = val

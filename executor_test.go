@@ -37,7 +37,7 @@ func Test_IfMatch_not_match(t *testing.T) {
 func Test_Exec(t *testing.T) {
 	expect := "test"
 	command := "echo $message"
-	item := LogcatItem{"message": expect}
+	item := LogcatEntry{"message": expect}
 
 	out := new(bytes.Buffer)
 	e := executor{
@@ -55,7 +55,7 @@ func Test_Exec(t *testing.T) {
 func Test_Exec_useFlag(t *testing.T) {
 	expect := "test"
 	command := "echo %m"
-	item := LogcatItem{"message": expect}
+	item := LogcatEntry{"message": expect}
 
 	out := new(bytes.Buffer)
 	e := executor{
@@ -72,7 +72,7 @@ func Test_Exec_useFlag(t *testing.T) {
 
 func Test_Exec_empty(t *testing.T) {
 	expect := "test"
-	item := LogcatItem{"message": expect}
+	item := LogcatEntry{"message": expect}
 
 	out := new(bytes.Buffer)
 	e := emptyExecutor{}
