@@ -1,4 +1,4 @@
-gox -output "dist/{{.OS}}_{{.Arch}}_{{.Dir}}" -os="windows darwin linux"
+gox -output "dist/{{.OS}}_{{.Arch}}_{{.Dir}}" -os="windows darwin linux" -ldflags="-s -w"
 cd dist
 mv  darwin_386_logcatf        logcatf
 zip darwin_386_logcatf        logcatf     -qm
