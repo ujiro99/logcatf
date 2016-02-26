@@ -56,8 +56,9 @@ func (cli *CLI) Run(args []string) int {
 
 // exec parse and format
 func (cli *CLI) parseLine(line string) LogcatItem {
-	item := parser.Parse(line)
-	if item == nil {
+	item, err := parser.Parse(line)
+	if err != nil {
+		log.Debug(err.Error())
 		return nil
 	}
 

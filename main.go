@@ -1,9 +1,10 @@
 package main
 
 import (
+	"os"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/mattn/go-colorable"
-	"os"
 )
 
 func init() {

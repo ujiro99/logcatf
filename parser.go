@@ -1,14 +1,13 @@
 package main
 
 import (
+	"errors"
 	"regexp"
-
-	log "github.com/Sirupsen/logrus"
 )
 
 // Parser parse logcat to struct.
 type Parser interface {
-	Parse(line string) LogcatItem
+	Parse(line string) (LogcatItem, error)
 }
 
 // logcatParser implements Parser
@@ -51,14 +50,13 @@ var (
 )
 
 // Parse a line of logcat.
-func (p *logcatParser) Parse(line string) LogcatItem {
+func (p *logcatParser) Parse(line string) (LogcatItem, error) {
 	logFormat := p.findFormat(line)
 	if logFormat == "" {
-		log.Warnf("Parse failed: %s", line)
-		return nil
+		return nil, errors.New("Parse failed: " + line)
 	}
 	item := p.search(line, logFormat)
-	return item
+	return item, nil
 }
 
 // search keyword using regex pattern.

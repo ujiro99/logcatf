@@ -80,7 +80,7 @@ func TestParse_in_test_dir(t *testing.T) {
 		for line := range lines.Lines(bufio.NewReader(fp)) {
 			// logfile has 2 formats, raw and some else.
 			// "--------- beginning of *" must be used raw format.
-			item := parser.Parse(line)
+			item, _ := parser.Parse(line)
 			expect := parsedContains[parser.findFormat(line)]
 			for key, hasValue := range expect {
 				if hasValue {
@@ -97,7 +97,7 @@ func TestParse_in_test_dir(t *testing.T) {
 func TestParse_value(t *testing.T) {
 	parser := logcatParser{}
 	for format, line := range logPatterns {
-		item := parser.Parse(line)
+		item, _ := parser.Parse(line)
 		expectItem := parsedValue[format]
 		for key, val := range expectItem {
 			if val != item[key] {
@@ -119,7 +119,7 @@ func TestParse_removeTailSpace(t *testing.T) {
 
 	parser := logcatParser{}
 	for format, log := range logPatternsHasSpace {
-		item := parser.Parse(log)
+		item, _ := parser.Parse(log)
 		for key, expect := range expects {
 			if parsedContains[format][key] && expect != item[key] {
 				t.Errorf("on %s, \"%s\" must eq \"%s\"", format, item[key], expect)
@@ -135,7 +135,7 @@ func TestParse_hasTabInMessage(t *testing.T) {
 
 	parser := logcatParser{}
 	for format, log := range logPatternsHasTab {
-		item := parser.Parse(log)
+		item, _ := parser.Parse(log)
 		for key, expect := range expects {
 			if parsedContains[format][key] && expect != item[key] {
 				t.Errorf("on %s, \"%s\" must eq \"%s\"", format, item[key], expect)
