@@ -33,6 +33,7 @@ var (
 	parser    logcat.Parser
 	writer    io.Writer
 	fmtc      Colorizer
+	version   string
 )
 
 // Run invokes the CLI with the given arguments.
@@ -88,7 +89,7 @@ func (cli *CLI) initialize(args []string) error {
 		colorF = app.Flag("color-f", Message["helpToColorF"]).PlaceHolder("COLOR").String()
 	)
 	app.HelpFlag.Short('h')
-	app.Version(Version)
+	app.Version(version)
 	kingpin.MustParse(app.Parse(args[1:]))
 
 	// initialize colorizer

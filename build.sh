@@ -1,4 +1,5 @@
-gox -output "dist/{{.OS}}_{{.Arch}}_{{.Dir}}" -os="windows darwin linux" -ldflags="-s -w"
+VERSION=$(git describe --tags)
+gox -output "dist/{{.OS}}_{{.Arch}}_{{.Dir}}" -os="windows darwin linux" -ldflags="-s -w -X main.version=${VERSION}"
 cd dist
 mv  darwin_386_logcatf        logcatf
 zip darwin_386_logcatf        logcatf     -qm
