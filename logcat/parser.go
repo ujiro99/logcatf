@@ -1,4 +1,4 @@
-package main
+package logcat
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 
 // Parser parse logcat to struct.
 type Parser interface {
-	Parse(line string) (LogcatEntry, error)
+	Parse(line string) (Entry, error)
 }
 
 // logcatParser implements Parser
@@ -49,8 +49,12 @@ var (
 	}
 )
 
+func NewParser() Parser {
+	return &logcatParser{}
+}
+
 // Parse a line of logcat.
-func (p *logcatParser) Parse(line string) (LogcatEntry, error) {
+func (p *logcatParser) Parse(line string) (Entry, error) {
 	logFormat := p.findFormat(line)
 	if logFormat == "" {
 		return nil, errors.New("Parse failed: " + line)
@@ -60,10 +64,10 @@ func (p *logcatParser) Parse(line string) (LogcatEntry, error) {
 }
 
 // search keyword using regex pattern.
-func (p *logcatParser) search(line string, format string) LogcatEntry {
+func (p *logcatParser) search(line string, format string) Entry {
 	pattern := patternMap[format]
 	match := pattern.FindStringSubmatch(line)
-	item := LogcatEntry{}
+	item := Entry{}
 	for i, val := range match[1:] {
 		key := paramOrderMap[format][i]
 		item[key] = val

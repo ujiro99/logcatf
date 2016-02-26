@@ -6,6 +6,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/ujiro99/logcatf/logcat"
 )
 
 func Test_IfMatch(t *testing.T) {
@@ -37,7 +39,7 @@ func Test_IfMatch_not_match(t *testing.T) {
 func Test_Exec(t *testing.T) {
 	expect := "test"
 	command := "echo $message"
-	item := LogcatEntry{"message": expect}
+	item := logcat.Entry{"message": expect}
 
 	out := new(bytes.Buffer)
 	e := executor{
@@ -55,7 +57,7 @@ func Test_Exec(t *testing.T) {
 func Test_Exec_useFlag(t *testing.T) {
 	expect := "test"
 	command := "echo %m"
-	item := LogcatEntry{"message": expect}
+	item := logcat.Entry{"message": expect}
 
 	out := new(bytes.Buffer)
 	e := executor{
@@ -72,7 +74,7 @@ func Test_Exec_useFlag(t *testing.T) {
 
 func Test_Exec_empty(t *testing.T) {
 	expect := "test"
-	item := LogcatEntry{"message": expect}
+	item := logcat.Entry{"message": expect}
 
 	out := new(bytes.Buffer)
 	e := emptyExecutor{}

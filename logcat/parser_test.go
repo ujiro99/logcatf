@@ -1,4 +1,4 @@
-package main
+package logcat
 
 import (
 	"bufio"
@@ -70,8 +70,7 @@ func TestFindFormat(t *testing.T) {
 func TestParse_in_test_dir(t *testing.T) {
 	parser := logcatParser{}
 	for format := range logPatterns {
-
-		filename := logPrefix + format + logExt
+		filename := "./test/logcat." + format + ".txt"
 		fp, err := os.Open(filename)
 		if err != nil {
 			t.Errorf("os.Open: %v", err)

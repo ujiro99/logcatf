@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"strings"
 	"testing"
+
+	"github.com/ujiro99/logcatf/logcat"
 )
 
 func TestRun_ReplaceColorCode(t *testing.T) {
@@ -24,7 +26,7 @@ func TestRun_Fprintln_enable(t *testing.T) {
 	format := "%t %p [_blue_]%m"
 	expect := "\033[31m%t %p \033[44m%m"
 
-	item := LogcatEntry{
+	item := logcat.Entry{
 		"time":     "12-28 19:01:14.073",
 		"priority": "F",
 		"message":  "logcat_message",
@@ -49,7 +51,7 @@ func TestRun_Fprintln_disable(t *testing.T) {
 	format := "%t %p [blue]%m"
 	expect := "%t %p %m"
 
-	item := LogcatEntry{
+	item := logcat.Entry{
 		"time":     "12-28 19:01:14.073",
 		"priority": "F",
 		"message":  "logcat_message",

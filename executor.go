@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/ujiro99/logcatf/logcat"
 )
 
 // Executor executes a command if neccesary.
@@ -20,7 +21,7 @@ type Executor interface {
 	IfMatch(line string) Executor
 
 	// Exec command.
-	Exec(item LogcatEntry)
+	Exec(item logcat.Entry)
 }
 
 // implements Executer.
@@ -62,7 +63,7 @@ func (e *executor) IfMatch(line string) Executor {
 }
 
 // execute command. implements Executer.
-func (e *executor) Exec(item LogcatEntry) {
+func (e *executor) Exec(item logcat.Entry) {
 	log.Debugf("--command start: \"%s\"", *e.command)
 
 	if item != nil {
@@ -109,5 +110,5 @@ func (e *emptyExecutor) IfMatch(line string) Executor {
 }
 
 // don't execute command.
-func (e *emptyExecutor) Exec(item LogcatEntry) {
+func (e *emptyExecutor) Exec(item logcat.Entry) {
 }

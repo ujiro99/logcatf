@@ -14,8 +14,7 @@ import (
 )
 
 const (
-	logPrefix = "./test/logcat."
-	logExt    = ".txt"
+	logPrefix = "./logcat/test/logcat."
 )
 
 func newCli() *CLI {
@@ -28,7 +27,7 @@ func newCli() *CLI {
 }
 
 func TestRun_formatDefault(t *testing.T) {
-	fp, err := os.Open(logPrefix + "threadtime" + logExt)
+	fp, err := os.Open(logPrefix + "threadtime.txt")
 	if err != nil {
 		t.Errorf("os.Open: %v", err)
 	}

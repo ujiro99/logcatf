@@ -6,6 +6,8 @@ import (
 	"regexp"
 	"runtime"
 
+	"github.com/ujiro99/logcatf/logcat"
+
 	"github.com/Maki-Daisuke/go-lines"
 	log "github.com/Sirupsen/logrus"
 	"golang.org/x/text/encoding/japanese"
@@ -28,7 +30,7 @@ type CLI struct {
 
 var (
 	formatter Formatter
-	parser    Parser
+	parser    logcat.Parser
 	writer    io.Writer
 	fmtc      Colorizer
 )
@@ -55,7 +57,7 @@ func (cli *CLI) Run(args []string) int {
 }
 
 // exec parse and format
-func (cli *CLI) parseLine(line string) LogcatEntry {
+func (cli *CLI) parseLine(line string) logcat.Entry {
 	item, err := parser.Parse(line)
 	if err != nil {
 		log.Debug(err.Error())
@@ -101,7 +103,7 @@ func (cli *CLI) initialize(args []string) error {
 	fmtc = Colorizer{}
 	fmtc.Init(*color, config)
 
-	parser = &logcatParser{}
+	parser = logcat.NewParser()
 	cli.initFormatter(*toCsv, *format)
 	cli.initWriter(*toCsv, *encode)
 
@@ -173,7 +175,7 @@ func (cli *CLI) initExecutors(triggers []*regexp.Regexp, commands []string) erro
 }
 
 // execute calls multiple executors.
-func (cli *CLI) execute(line string, item LogcatEntry) {
+func (cli *CLI) execute(line string, item logcat.Entry) {
 	for _, e := range cli.executors {
 		e.IfMatch(line).Exec(item)
 	}

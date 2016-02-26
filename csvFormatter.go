@@ -5,6 +5,8 @@ import (
 	"encoding/csv"
 	"runtime"
 	"strings"
+
+	"github.com/ujiro99/logcatf/logcat"
 )
 
 // implements Formatter
@@ -27,7 +29,7 @@ func NewCsvFormatter(format string) Formatter {
 // Format implements Formatter
 // replace %* keywords to real value. use short format.
 //   ex) "%t %a" => "12-28 19:01:14.073", GLSUser
-func (f *csvFormatter) Format(item *LogcatEntry) string {
+func (f *csvFormatter) Format(item *logcat.Entry) string {
 	matches := sformatRegex.FindAllStringSubmatch(*f.format, len(formatMap))
 	args := make([]string, 0, len(matches))
 	// find matched keyword and store value on item
