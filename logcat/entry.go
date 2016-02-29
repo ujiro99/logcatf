@@ -1,21 +1,32 @@
 package logcat
 
-import (
-	"time"
-)
+var allKeys = []string{"time", "pid", "tid", "priority", "tag", "message"}
 
 // Entry represents a line of logcat log.
 type Entry map[string]string
 
-// Keys returns valid keys for Entry
+// Keys returns existing keys in this Entry
 func (item *Entry) Keys() []string {
-	return []string{
-		"time", "pid", "tid", "priority", "tag", "message",
+	keys := make([]string, len(*item))
+	j := 0
+	for _, k := range allKeys {
+		if _, ok := (*item)[k]; ok {
+			keys[j] = k
+			j = j + 1
+		}
 	}
+	return keys
 }
 
-// Time return parsed time.
-func (item *Entry) Time() time.Time {
-	t, _ := time.Parse("12-28 18:54:08.043", (*item)["time"])
-	return t
+// Values returns existing values int this Entry
+func (item *Entry) Values() []string {
+	values := make([]string, len(*item))
+	j := 0
+	for _, k := range allKeys {
+		if v, ok := (*item)[k]; ok {
+			values[j] = v
+			j = j + 1
+		}
+	}
+	return values
 }
