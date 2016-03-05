@@ -15,10 +15,10 @@ func (item *Entry) Keys() []string {
 			j = j + 1
 		}
 	}
-	return keys
+	return keys[:j]
 }
 
-// Values returns existing values int this Entry
+// Values returns existing values in this Entry
 func (item *Entry) Values() []string {
 	values := make([]string, len(*item))
 	j := 0
@@ -28,7 +28,7 @@ func (item *Entry) Values() []string {
 			j = j + 1
 		}
 	}
-	return values
+	return values[:j]
 }
 
 // Format of this logcat entry.

@@ -79,6 +79,13 @@ func TestEntry_Values_Full(t *testing.T) {
 	}
 }
 
+func TestEntry_Values_Raw(t *testing.T) {
+	values := itemRaw.Values()
+	if len(values) != 1 {
+		t.Errorf("item must has length 1")
+	}
+}
+
 func TestEntry_Format(t *testing.T) {
 	if itemRaw.Format() != "raw" {
 		t.Errorf("item format must be raw")
