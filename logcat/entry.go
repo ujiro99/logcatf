@@ -30,3 +30,8 @@ func (item *Entry) Values() []string {
 	}
 	return values
 }
+
+// Format of this logcat entry.
+func (item *Entry) Format() string {
+	return (*item)["format"]
+}

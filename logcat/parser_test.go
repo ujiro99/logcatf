@@ -64,6 +64,10 @@ func TestFindFormat(t *testing.T) {
 		if expect != finded {
 			t.Errorf("expected %s to eq %s", expect, finded)
 		}
+		item, _ := parser.Parse(log)
+		if expect != item.Format() {
+			t.Errorf("expected %s to eq %s", expect, finded)
+		}
 	}
 }
 

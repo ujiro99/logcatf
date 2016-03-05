@@ -67,7 +67,7 @@ func (p *logcatParser) Parse(line string) (Entry, error) {
 func (p *logcatParser) search(line string, format string) Entry {
 	pattern := patternMap[format]
 	match := pattern.FindStringSubmatch(line)
-	item := Entry{}
+	item := Entry{"format": format}
 	for i, val := range match[1:] {
 		key := paramOrderMap[format][i]
 		item[key] = val

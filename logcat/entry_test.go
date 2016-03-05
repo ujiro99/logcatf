@@ -18,6 +18,11 @@ var (
 		"message":  "This is test message",
 		"tag":      "Tag",
 	}
+
+	itemRaw = &Entry{
+		"message": "this is test message",
+		"format":  "raw",
+	}
 )
 
 func TestEntry_Keys_Empty(t *testing.T) {
@@ -59,15 +64,23 @@ func TestEntry_Values_Empty(t *testing.T) {
 		t.Errorf("itemEmpty must has length 0")
 	}
 }
+
 func TestEntry_Values(t *testing.T) {
 	values := item.Values()
 	if len(values) != 2 {
 		t.Errorf("item must has length 2")
 	}
 }
+
 func TestEntry_Values_Full(t *testing.T) {
 	values := itemFull.Values()
 	if len(values) != 6 {
 		t.Errorf("item must has length 6")
+	}
+}
+
+func TestEntry_Format(t *testing.T) {
+	if itemRaw.Format() != "raw" {
+		t.Errorf("item format must be raw")
 	}
 }
